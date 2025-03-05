@@ -11,12 +11,9 @@ func _ready() -> void:
 	LocalSettings.setting_changed.connect(_setting_changed)
 
 	# Disable the FPS cap button when V Sync is enabled at startup
-	if LocalSettings.load_setting("General", "v_sync", 0) == 1:
-		fps_cap_button.toggle_disable()
+	fps_cap_button.toggle_disable(LocalSettings.load_setting("General", "v_sync", 0))
 
 
 func _setting_changed(key: String, _value: Variant) -> void:
-	match key:
-		"v_sync":
-			# Disable the FPS cap button when V Sync is enabled
-			fps_cap_button.toggle_disable()
+	if key == "v_sync":
+		fps_cap_button.toggle_disable()
