@@ -17,6 +17,7 @@ static func set_win_size(window_scale):
 	var screen_size: Vector2i = DisplayServer.screen_get_size()
 	var window_size: Vector2i = default_size * (window_scale + 1)
 
+
 	# Set fullscreen if a window scale exceeds the bounds of the screen.
 	if window_size > screen_size:
 		window_scale = MAX_SCALE
@@ -26,10 +27,11 @@ static func set_win_size(window_scale):
 
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_size(window_size)
-	
+
+		var screen_pos: Vector2i = DisplayServer.screen_get_position(DisplayServer.window_get_current_screen())
 		var window_pos: Vector2i = (screen_size - window_size) / 2
-		DisplayServer.window_set_position(window_pos)
+		DisplayServer.window_set_position(screen_pos + window_pos)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-	
+
 	#Singleton.EditorSavedSettings.stored_window_scale = window_scale
