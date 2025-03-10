@@ -43,21 +43,15 @@ func _physics_process(delta: float) -> void:
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"camera_zoom_in"):
-		if target_zoom != camera_properties.zoom_min:
+		if target_zoom != camera_properties.min_zoom:
 			zoom_in_sfx.play_sfx_at(self)
 
-		if target_zoom <= 100:
-			target_zoom -= 25
-		else:
-			target_zoom -= 50
+		target_zoom -= camera_properties.get_zoom_in_step(target_zoom)
 
 	if event.is_action_pressed(&"camera_zoom_out"):
-		if target_zoom != camera_properties.zoom_max:
+		if target_zoom != camera_properties.max_zoom:
 			zoom_out_sfx.play_sfx_at(self)
 
-		if target_zoom < 100:
-			target_zoom += 25
-		else:
-			target_zoom += 50
+		target_zoom += camera_properties.get_zoom_out_step(target_zoom)
 
-	target_zoom = clamp(target_zoom, camera_properties.zoom_min, camera_properties.zoom_max)
+	target_zoom = clamp(target_zoom, camera_properties.min_zoom, camera_properties.max_zoom)
