@@ -18,6 +18,7 @@ static func set_win_size(window_scale):
 	var screen_size: Vector2i = DisplayServer.screen_get_size(screen)
 	var window_size: Vector2i = default_size * (window_scale + 1)
 
+
 	# Set fullscreen if a window scale exceeds the bounds of the screen.
 	if window_size > screen_size:
 		window_scale = MAX_SCALE
@@ -27,7 +28,6 @@ static func set_win_size(window_scale):
 
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		DisplayServer.window_set_size(window_size)
-	
 		var screen_top_left: Vector2i = DisplayServer.screen_get_position(screen)
 
 		# On multi-monitor setups, the screen position is relative to the virtual desktop area.

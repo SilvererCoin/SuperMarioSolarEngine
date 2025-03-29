@@ -1,9 +1,23 @@
-[gd_scene load_steps=7 format=3 uid="uid://cnd277snrwca5"]
+[gd_scene load_steps=9 format=3 uid="uid://cnd277snrwca5"]
 
 [ext_resource type="Script" uid="uid://b8xq8roo5asyr" path="res://entities/player/shared/player_camera.gd" id="1_8exb6"]
 [ext_resource type="Script" uid="uid://dvlt5sb8enmu8" path="res://util/sfx_layer.gd" id="2_hvhmj"]
+[ext_resource type="Script" uid="uid://tfsnqruge65r" path="res://util/player_camera_properties.gd" id="2_qicgx"]
 [ext_resource type="AudioStream" uid="uid://dakcghvbe6vva" path="res://entities/player/shared/camera_in.wav" id="3_tywbp"]
 [ext_resource type="AudioStream" uid="uid://c66je7k6yx3c7" path="res://entities/player/shared/camera_out.wav" id="4_bl75n"]
+
+[sub_resource type="Resource" id="Resource_6rl5x"]
+script = ExtResource("2_qicgx")
+player_control = false
+default_zoom = 100.0
+max_zoom = 200.0
+min_zoom = 50.0
+zoom_steps = 2
+zoom_follow_speed = 5.0
+velocity_pan_factor = 8.0
+pan_follow_speed = 2.0
+camera_limits = Rect2(0, 0, 0, 0)
+metadata/_custom_type_script = "uid://tfsnqruge65r"
 
 [sub_resource type="Resource" id="Resource_dq0cd"]
 script = ExtResource("2_hvhmj")
@@ -31,5 +45,6 @@ drag_vertical_enabled = true
 drag_top_margin = 0.3
 editor_draw_drag_margin = true
 script = ExtResource("1_8exb6")
+default_camera_properties = SubResource("Resource_6rl5x")
 zoom_in_sfx = SubResource("Resource_dq0cd")
 zoom_out_sfx = SubResource("Resource_rtieh")

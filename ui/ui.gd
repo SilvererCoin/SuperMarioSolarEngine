@@ -61,8 +61,8 @@ func _process(_delta):
 
 func _input(event: InputEvent):
 	if (
-		(event.is_action_pressed(&"camera_zoom_in") and camera.target_zoom != camera.zoom_min) or
-		(event.is_action_pressed(&"camera_zoom_out") and camera.target_zoom != camera.zoom_max)
+		(event.is_action_pressed(&"camera_zoom_in") and camera.target_zoom != camera.camera_properties.min_zoom) or
+		(event.is_action_pressed(&"camera_zoom_out") and camera.target_zoom != camera.camera_properties.max_zoom)
 	):
 		zoom_blur_player.stop()
 		zoom_blur_player.play(&"camera_focus")
