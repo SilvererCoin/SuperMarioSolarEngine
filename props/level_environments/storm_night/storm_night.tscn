@@ -1,0 +1,79 @@
+[gd_scene load_steps=13 format=3 uid="uid://btpluqyw0y5gx"]
+
+[ext_resource type="Script" uid="uid://ccysh3ski6mvh" path="res://props/level_environments/environment.gd" id="1_llem3"]
+[ext_resource type="Shader" uid="uid://d3mu7r0k43ykr" path="res://props/level_environments/storm_night/sky_gradient.gdshader" id="2_a6wt5"]
+[ext_resource type="Texture2D" uid="uid://b7ry1tjdunhtt" path="res://props/level_environments/storm_night/star_twinkle.png" id="3_6acqj"]
+
+[sub_resource type="Gradient" id="Gradient_a6wt5"]
+colors = PackedColorArray(0, 0, 0, 1, 0.2024, 0.2024, 0.46, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_6acqj"]
+gradient = SubResource("Gradient_a6wt5")
+
+[sub_resource type="Curve" id="Curve_6acqj"]
+_data = [Vector2(0, 0.25), 0.0, -0.85, 0, 0, Vector2(0.5, 0), 0.0, 0.0, 0, 0, Vector2(1, 0.25), 0.85, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_y7kw2"]
+curve = SubResource("Curve_6acqj")
+
+[sub_resource type="Gradient" id="Gradient_338ij"]
+offsets = PackedFloat32Array(0.2931727, 0.7188755)
+colors = PackedColorArray(0.04420001, 0.036399994, 0.13, 1, 0.043500025, 0, 0.29, 1)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_0nril"]
+gradient = SubResource("Gradient_338ij")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_b4j02"]
+shader = ExtResource("2_a6wt5")
+shader_parameter/gradient = SubResource("GradientTexture1D_0nril")
+shader_parameter/curve = SubResource("CurveTexture_y7kw2")
+shader_parameter/horizon = 0.70000003325
+shader_parameter/draw_horizon = false
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_y7kw2"]
+particles_animation = true
+particles_anim_h_frames = 10
+particles_anim_v_frames = 1
+particles_anim_loop = true
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_6acqj"]
+particle_flag_disable_z = true
+emission_shape_scale = Vector3(1.2, 1, 1)
+emission_shape = 1
+emission_sphere_radius = 320.0
+direction = Vector3(-1, 0, 0)
+spread = 0.0
+orbit_velocity_min = 0.010000096
+orbit_velocity_max = 0.010000096
+gravity = Vector3(0, 0, 0)
+anim_speed_min = 0.5
+anim_speed_max = 1.0
+
+[node name="StormNight" type="CanvasLayer"]
+layer = -1
+script = ExtResource("1_llem3")
+pause_gradient_map = SubResource("GradientTexture1D_6acqj")
+metadata/_custom_type_script = "uid://ccysh3ski6mvh"
+
+[node name="Sky" type="CanvasLayer" parent="."]
+layer = -3
+
+[node name="Gradient" type="ColorRect" parent="Sky"]
+material = SubResource("ShaderMaterial_b4j02")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Stars" type="GPUParticles2D" parent="Sky"]
+material = SubResource("CanvasItemMaterial_y7kw2")
+position = Vector2(317, -88)
+scale = Vector2(1, 0.6)
+amount = 400
+texture = ExtResource("3_6acqj")
+fixed_fps = 0
+visibility_rect = Rect2(-512, -128, 1024, 285.065)
+draw_order = 0
+process_material = SubResource("ParticleProcessMaterial_6acqj")
