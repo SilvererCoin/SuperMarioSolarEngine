@@ -10,7 +10,11 @@ uniform bool draw_horizon = false;
 
 void fragment() {
 	float y_offset = texture(curve, UV).r;
-	float horizon_distance = abs(horizon - UV.y);
+	float horizon_distance = horizon - UV.y;
+	
+	if (sign(horizon_distance) == -1.0) {
+		horizon_distance = 0.0;
+	}
 	
 	COLOR = texture(gradient, vec2(UV.y + (y_offset * horizon_distance) , 0.0));
 	
