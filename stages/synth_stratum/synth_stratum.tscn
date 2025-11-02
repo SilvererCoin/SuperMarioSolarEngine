@@ -32,6 +32,8 @@
 [ext_resource type="PackedScene" uid="uid://b14pbye1baqly" path="res://entities/collectibles/coin/coin.tscn" id="30_ihghk"]
 [ext_resource type="PackedScene" uid="uid://ui2jk0qwltpw" path="res://entities/collectibles/shine/shine.tscn" id="31_nma4k"]
 [ext_resource type="PackedScene" uid="uid://c3vng5ftys6bt" path="res://entities/interactables/sign/sign.tscn" id="32_rtnqg"]
+[ext_resource type="PackedScene" uid="uid://d1qpcty7kyi5p" path="res://entities/breakables/breakable_box/breakable_box.tscn" id="33_kuv8v"]
+[ext_resource type="PackedScene" uid="uid://ddtpa42oyu7fe" path="res://entities/breakables/crate/crate.tscn" id="34_l20wn"]
 
 [sub_resource type="Resource" id="Resource_80yte"]
 script = ExtResource("3_rtnqg")
@@ -875,7 +877,6 @@ _points = {
 123: SubResource("Resource_0xvuj"),
 124: SubResource("Resource_hihfq"),
 126: SubResource("Resource_5jgws"),
-131: SubResource("Resource_qdpex"),
 132: SubResource("Resource_06slp"),
 133: SubResource("Resource_g2scn"),
 134: SubResource("Resource_msq4b"),
@@ -898,11 +899,11 @@ _points = {
 156: SubResource("Resource_vt5ir"),
 157: SubResource("Resource_lbcch")
 }
-_point_order = Array[int]([148, 146, 134, 137, 138, 135, 136, 124, 131, 133, 132, 126, 123, 122, 0, 41, 40, 39, 38, 37, 87, 88, 27, 31, 152, 153, 154, 151, 157, 156, 62, 22, 1, 63, 64, 73, 74, 66, 75, 71, 78, 67, 68, 69, 65, 70, 90, 53, 96, 95, 92, 100, 99, 101, 102, 116, 115, 103, 105, 104, 106, 120, 108, 109, 111, 110, 93, 98, 97, 94, 91, 113, 117, 112, 118, 114, 89, 142, 143, 145, 155, 150, 149])
+_point_order = Array[int]([148, 146, 134, 137, 138, 135, 136, 124, 133, 132, 126, 123, 122, 0, 41, 40, 39, 38, 37, 87, 88, 27, 31, 152, 153, 154, 151, 157, 156, 62, 22, 1, 63, 64, 73, 74, 66, 75, 71, 78, 67, 68, 69, 65, 70, 90, 53, 96, 95, 92, 100, 99, 101, 102, 116, 115, 103, 105, 104, 106, 120, 108, 109, 111, 110, 93, 98, 97, 94, 91, 113, 117, 112, 118, 114, 89, 142, 143, 145, 155, 150, 149])
 _constraints = {
 Array[int]([148, 149]): 15
 }
-_next_key = 158
+_next_key = 160
 
 [sub_resource type="Resource" id="Resource_mrf71"]
 script = ExtResource("18_4jkwe")
@@ -1528,7 +1529,7 @@ player = NodePath("Mario")
 camera = NodePath("Mario/PlayerCamera")
 
 [node name="Mario" parent="." instance=ExtResource("10_dvxun")]
-position = Vector2(601, 0)
+position = Vector2(-810, -465)
 
 [node name="PlayerCamera" parent="Mario" instance=ExtResource("11_rowtk")]
 ignore_rotation = false
@@ -1549,7 +1550,7 @@ collision_polygon_node_path = NodePath("../CollisionPolygon2D")
 [node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="StaticBody2D"]
 visible = false
 modulate = Color(1, 1, 1, 0.3)
-polygon = PackedVector2Array(4079.994, -1167.105, 4079.0938, 536.8312, -1219.1621, 515.9003, -1221.7952, 133.38492, -918.8863, 135.16771, -917.1052, -302.9461, -1145.1833, -302.9426, -1138.57, -422.53802, -1138.5652, -422.69354, -1138.5092, -423.1464, -1138.3402, -423.87582, -1137.9978, -424.86133, -1137.4207, -426.082, -1136.5471, -427.51736, -1135.3165, -429.1467, -1133.6674, -430.9495, -1131.5385, -432.90497, -1128.8688, -434.9928, -1121.6616, -439.4818, -1111.5555, -444.25104, -1098.0616, -449.1362, -1058.9495, -458.59164, -1000.4068, -466.527, -809.358, -472.55148, -621.3929, -461.83374, -566.01135, -452.60754, -546.0541, -447.54837, -530.5226, -442.3905, -518.8689, -437.28247, -510.5458, -432.3725, -507.4622, -430.03812, -505.00558, -427.8096, -503.10785, -425.70502, -501.70038, -423.743, -500.7148, -421.94214, -500.08282, -420.32092, -499.7359, -418.89813, -499.60565, -417.69226, -499.62363, -416.72202, -499.7212, -416.00595, -499.83008, -415.56274, -499.87405, -415.40985, -496.38892, -310.0741, -796.28973, -305.17194, -809.71796, 72.69777, -586.31085, 75.37074, -584.099, -8.101567, -536, -8.000003, -447.89645, -8.103554, -447.89645, 183.89645, -48.10355, 183.89645, -48.103466, -8.103347, 213.73958, -8.406497, 214.9287, 187.8124, 531.35547, 186.92566, 527.893, -8.1055565, 639.8297, -7.579619, 703.08325, 53.889336, 767.11475, 52.046516, 767.8988, -8.102614, 983.854, -8.11707, 967.8236, -80.2865, 1055.9972, -8.120548, 1135.9882, -80.03099, 1264.1046, -80.10402, 1263.6837, -13.79147, 1547.5557, -10.219879, 1547.6272, -152.7159, 1652.1978, -153.68867, 1653.3676, -480.92944, 1532.6099, -483.97293, 1381.67, -484.534, 1359.1818, -484.30173, 1360.56, -537.559, 1361.5737, -563.4492, 1633.387, -562.12115, 1700.4268, -625.2723, 1867.1837, -622.64734, 1863.6648, -176.99852, 1949.4498, -176.59204, 1990.31, -175.50415, 2072.2698, -177.28506, 2150.6838, -176.42807, 2248.314, -81.193985, 2386.9756, -80.84303, 2384.4456, 125.23709, 2668.1394, 126.12927, 2670.6409, -8.391676, 2617.4714, -59.188625, 2619.2192, -187.82515, 2766.6763, -188.88324, 2773.0178, -306.9492, 2537.1892, -310.2953, 2532.7083, -165.11069, 2422.5083, -165.18005, 2421.72, -278.935, 2422.2144, -345.4472, 2345.31, -344.8597, 2302.12, -347.44647, 2062.5732, -339.33038, 2063.4666, -267.16013, 1955.4537, -268.05368, 1958.1685, -416.64816, 2423.85, -408.7805, 2432.019, -701.91296, 2385.0938, -757.275, 2383.192, -818.57104, 2537.3328, -819.9446, 2889.1626, -496.64664, 3038.44, -502.74954, 3038.7065, -708.918, 3332.079, -707.94977, 3361.4656, -716.2172, 3393.1062, -728.4056, 3431.5183, -747.6056, 3473.3076, -775.04913, 3494.408, -792.2475, 3515.0793, -811.9691, 3534.8972, -834.3679, 3553.4377, -859.5981, 3570.2766, -887.8135, 3584.99, -919.168, 3599.8528, -950.91534, 3617.1182, -980.2392, 3636.3215, -1007.1921, 3656.9985, -1031.8253, 3700.9207, -1074.3397, 3745.176, -1108.196, 3786.0537, -1133.8085, 3819.845, -1151.5908, 3851.328, -1165.33)
+polygon = PackedVector2Array(4079.994, -1167.105, 4079.0938, 536.8312, -1219.1621, 515.9003, -1221.7952, 133.38492, -918.8863, 135.16771, -917.1052, -302.9461, -1145.1747, -302.94598, -1144.1024, -472.1031, -495.8959, -472.1038, -496.3952, -310.07654, -796.28973, -305.17194, -809.71796, 72.69777, -586.31085, 75.37074, -584.099, -8.101567, -536, -8.000003, -447.89645, -8.103554, -447.89645, 183.89645, -48.10355, 183.89645, -48.103466, -8.103347, 213.73958, -8.406497, 214.9287, 187.8124, 531.35547, 186.92566, 527.893, -8.1055565, 639.8297, -7.579619, 703.08325, 53.889336, 767.11475, 52.046516, 767.8988, -8.102614, 983.854, -8.11707, 967.8236, -80.2865, 1055.9972, -8.120548, 1135.9882, -80.03099, 1264.1046, -80.10402, 1263.6837, -13.79147, 1547.5557, -10.219879, 1547.6272, -152.7159, 1652.1978, -153.68867, 1653.3676, -480.92944, 1532.6099, -483.97293, 1381.67, -484.534, 1359.1818, -484.30173, 1360.56, -537.559, 1361.5737, -563.4492, 1633.387, -562.12115, 1700.4268, -625.2723, 1867.1837, -622.64734, 1863.6648, -176.99852, 1949.4498, -176.59204, 1990.31, -175.50415, 2072.2698, -177.28506, 2150.6838, -176.42807, 2248.314, -81.193985, 2386.9756, -80.84303, 2384.4456, 125.23709, 2668.1394, 126.12927, 2670.6409, -8.391676, 2617.4714, -59.188625, 2619.2192, -187.82515, 2766.6763, -188.88324, 2773.0178, -306.9492, 2537.1892, -310.2953, 2532.7083, -165.11069, 2422.5083, -165.18005, 2421.72, -278.935, 2422.2144, -345.4472, 2345.31, -344.8597, 2302.12, -347.44647, 2062.5732, -339.33038, 2063.4666, -267.16013, 1955.4537, -268.05368, 1958.1685, -416.64816, 2423.85, -408.7805, 2432.019, -701.91296, 2385.0938, -757.275, 2383.192, -818.57104, 2537.3328, -819.9446, 2889.1626, -496.64664, 3038.44, -502.74954, 3038.7065, -708.918, 3332.079, -707.94977, 3361.4656, -716.2172, 3393.1062, -728.4056, 3431.5183, -747.6056, 3473.3076, -775.04913, 3494.408, -792.2475, 3515.0793, -811.9691, 3534.8972, -834.3679, 3553.4377, -859.5981, 3570.2766, -887.8135, 3584.99, -919.168, 3599.8528, -950.91534, 3617.1182, -980.2392, 3636.3215, -1007.1921, 3656.9985, -1031.8253, 3700.9207, -1074.3397, 3745.176, -1108.196, 3786.0537, -1133.8085, 3819.845, -1151.5908, 3851.328, -1165.33)
 
 [node name="SS2D_Shape2" type="Node2D" parent="StaticBody2D"]
 texture_repeat = 2
@@ -1854,8 +1855,86 @@ position = Vector2(3912, -1224)
 particle = null
 
 [node name="Shine2" parent="." instance=ExtResource("31_nma4k")]
-position = Vector2(1196, -138)
+position = Vector2(1057, -234)
 particle = null
 
 [node name="Sign" parent="." instance=ExtResource("32_rtnqg")]
 position = Vector2(305, 196)
+
+[node name="BreakableBox" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(414, 134)
+
+[node name="BreakableBox2" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, 142)
+
+[node name="BreakableBox3" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, 110)
+
+[node name="BreakableBox4" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, 78)
+
+[node name="BreakableBox5" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, 46)
+
+[node name="BreakableBox6" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, 14)
+
+[node name="BreakableBox7" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -18)
+
+[node name="BreakableBox8" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -50)
+
+[node name="BreakableBox9" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -82)
+
+[node name="BreakableBox10" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -114)
+
+[node name="BreakableBox11" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -146)
+
+[node name="BreakableBox12" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -178)
+
+[node name="BreakableBox13" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -210)
+
+[node name="BreakableBox14" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -242)
+
+[node name="BreakableBox15" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -274)
+
+[node name="BreakableBox16" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -306)
+
+[node name="BreakableBox17" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -338)
+
+[node name="BreakableBox18" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -370)
+
+[node name="BreakableBox19" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -402)
+
+[node name="BreakableBox20" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -434)
+
+[node name="BreakableBox21" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -466)
+
+[node name="BreakableBox22" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -498)
+
+[node name="BreakableBox23" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -530)
+
+[node name="BreakableBox24" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -562)
+
+[node name="BreakableBox25" parent="." instance=ExtResource("33_kuv8v")]
+position = Vector2(-1204, -594)
+
+[node name="Crate" parent="." instance=ExtResource("34_l20wn")]
+position = Vector2(-720, -544)
