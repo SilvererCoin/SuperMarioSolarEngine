@@ -8,7 +8,7 @@ signal ready_for_load_in
 
 @export var scene_transition: SceneTransition
 
-## The [KeyScreen] we are transitioning from.
+## The [KeyScene] we are transitioning from.
 var current_key_screen
 
 

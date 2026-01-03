@@ -18,7 +18,7 @@ func _on_animation_player_animation_finished(anim_name: StringName) -> void:
 
 func _on_play_pressed() -> void:
 	TransitionManager.transition_scene(
-		ResourceUID.id_to_text(ResourceLoader.get_resource_uid(wm_scene)),
+		wm_scene,
 		SceneTransition.Type.CIRCLE,
 		SceneTransition.Type.CIRCLE
 	)
@@ -26,7 +26,7 @@ func _on_play_pressed() -> void:
 
 func _on_edit_pressed() -> void:
 	TransitionManager.transition_scene(
-		ResourceUID.id_to_text(ResourceLoader.get_resource_uid(editor_scene)),
+		editor_scene,
 		SceneTransition.Type.CIRCLE,
 		SceneTransition.Type.CIRCLE
 	)
@@ -34,11 +34,10 @@ func _on_edit_pressed() -> void:
 
 func _on_record_pressed() -> void:
 	pass
-	#TransitionManager.transition_scene(ResourceUID.id_to_text(ResourceLoader.get_resource_uid(wm_scene)))
 
 
 func _on_transition_to(_handover: Variant = null) -> void:
-	pass
+	TransitionManager.greenlight_load_in()
 
 
 func _on_transition_from() -> void:

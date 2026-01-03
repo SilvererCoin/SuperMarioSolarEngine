@@ -9,8 +9,6 @@ script = ExtResource("1_uyoy3")
 scene_transition = NodePath("SceneTransition")
 
 [node name="SceneTransition" parent="." instance=ExtResource("2_v0gsh")]
-preview_to = 0
-preview_from = 0
 
 [node name="PlainOverlay" parent="SceneTransition" index="0"]
 mouse_filter = 2
@@ -19,7 +17,6 @@ mouse_filter = 2
 mouse_filter = 2
 
 [node name="InvertedCircleOverlay" parent="SceneTransition" index="2"]
-visible = false
 mouse_filter = 2
 
 [editable path="SceneTransition"]

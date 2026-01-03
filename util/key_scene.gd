@@ -1,7 +1,9 @@
 @abstract
 class_name KeyScene
 extends Control
-## Class for key screens, such as the Title Screen, Level Select screen,  Game World, or others that the TransitionManager can warp to if needed
+## Class for key screens, such as the Title Screen,
+## Level Select screen,  Game World, or others
+## that the TransitionManager can warp to.
 
 
 func _ready() -> void:

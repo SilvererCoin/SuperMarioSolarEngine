@@ -984,6 +984,7 @@ stretch_mode = 1
 flip_h = true
 script = ExtResource("40_cynfm")
 warning_text = NodePath("Spacing/Main/WarningText")
+title_screen = "uid://cthxoel5sus6v"
 open_sfx = ExtResource("41_r4q0q")
 close_sfx = ExtResource("3_cb22p")
 open_anim = &"warning_peek"
