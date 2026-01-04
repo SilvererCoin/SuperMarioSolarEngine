@@ -138,7 +138,7 @@ grow_vertical = 2
 script = ExtResource("1_n6pnn")
 anime = NodePath("AnimationPlayer")
 focus_grabber = NodePath("Contents/Choices/Play")
-wm_scene = "uid://bite6o37o0mpt"
+mission_selece_scene = "uid://hott1qcj6hk"
 editor_scene = "uid://bfrw3lh0b17ri"
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
