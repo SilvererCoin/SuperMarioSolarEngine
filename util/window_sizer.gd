@@ -47,8 +47,8 @@ static func set_win_scale(new_scale):
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 
 
-## Sets the [code]viewport_size[/code] global shader parameter.
+## Sets the [code]VIEWPORT_SIZE[/code] global shader parameter.
 ## This should be connected to the [signal Viewport.size_changed] signal.
 static func set_global_shader_size(new_resolution: Vector2):
-	RenderingServer.global_shader_parameter_set("viewport_size", new_resolution)
+	RenderingServer.global_shader_parameter_set("VIEWPORT_SIZE", new_resolution)
 	print(new_resolution)

@@ -340,7 +340,7 @@ renderer/rendering_method.mobile="gl_compatibility"
 
 [shader_globals]
 
-viewport_size={
+VIEWPORT_SIZE={
 "type": "vec2",
 "value": Vector2(640, 360)
 }
