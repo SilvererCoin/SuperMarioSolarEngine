@@ -4,6 +4,6 @@
 
 [resource]
 shader = ExtResource("1_emhgw")
-shader_parameter/outline_color = Color(18.892157, 18.892157, 18.892157, 1)
+shader_parameter/outline_color = Color(2.454227, 2.454227, 2.454227, 1)
 shader_parameter/blink_color = Color(1, 0.79607844, 0.42745098, 1)
 shader_parameter/blink_time_scale = 5.000000074506
