@@ -157,7 +157,7 @@ grow_horizontal = 2
 grow_vertical = 0
 texture = SubResource("GradientTexture2D_ko2tk")
 script = ExtResource("1_dubgv")
-line_color = Color(1.2213326, 0.48759422, 2.805782, 1)
+line_color = Color(1.7636611, 0.48759422, 2.805782, 1)
 scroll_divisor = 20.0
 
 [node name="Parallax2D" type="Parallax2D" parent="ParallaxBackground"]
