@@ -105,7 +105,7 @@ draw_order = 0
 process_material = SubResource("ParticleProcessMaterial_8i7lr")
 
 [node name="Sun" type="TextureRect" parent="ParallaxBackground"]
-modulate = Color(1.2998776, 1.2998776, 1.5720325, 1)
+modulate = Color(1.3007382, 1.5802358, 1.8247963, 1)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
