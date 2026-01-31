@@ -56,7 +56,6 @@ tonemap_white = 7.41
 glow_enabled = true
 adjustment_enabled = true
 adjustment_brightness = 0.5
-adjustment_contrast = 0.9
 adjustment_saturation = 1.2
 
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oe8qa"]
