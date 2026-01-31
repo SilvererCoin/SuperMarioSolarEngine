@@ -1,3 +1,4 @@
+@tool
 extends TextureRect
 
 @export_color_no_alpha var line_color: Color
@@ -17,7 +18,9 @@ var cam_x: float
 
 
 func _physics_process(_delta):
-	cam_x = -environment.camera.get_screen_center_position().x / scroll_divisor
+	if !Engine.is_editor_hint():
+		cam_x = -environment.camera.get_screen_center_position().x / scroll_divisor
+	
 	queue_redraw()
 
 
