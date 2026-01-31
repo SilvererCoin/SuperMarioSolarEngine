@@ -4,7 +4,7 @@ extends Collectible
 ## Base class for collectible coins.
 
 
-enum COIN_TYPE{
+enum TYPE{
 	YELLOW = 0, ## Common yellow coin, adds +1 to the coin counter.
 	BLUE = 1, ## Uncommon blue coin, adds +5 to the coin counter.
 	RED = 2, ## One of the level's red coins. Collect all of them to spawn a Shine Sprite.
@@ -13,14 +13,14 @@ enum COIN_TYPE{
 ## Total red coin count in a level.
 static var total_reds: int = 0
 
-@export var type: COIN_TYPE:
+@export var type: TYPE:
 	set(val):
 		type = val
 		play(str(type))
 
-@export var respective_sounds: Dictionary[COIN_TYPE, AudioStream]
+@export var respective_sounds: Dictionary[TYPE, AudioStream]
 @export var last_red_sound: AudioStream
-@export var respective_particles: Dictionary[COIN_TYPE, ParticleEffect]
+@export var respective_particles: Dictionary[TYPE, ParticleEffect]
 
 
 func _ready() -> void:
@@ -28,7 +28,7 @@ func _ready() -> void:
 
 	play(str(type))
 
-	if type == COIN_TYPE.RED:
+	if type == TYPE.RED:
 		add_to_group(&"red_coins")
 		total_reds += 1
 
@@ -40,7 +40,7 @@ func _on_collect():
 
 	respective_particles[type].emit_at(parent, position)
 
-	if type == COIN_TYPE.RED:
+	if type == TYPE.RED:
 		var remaining_reds: int = get_tree().get_nodes_in_group(&"red_coins").size()
 
 		if remaining_reds == 1:

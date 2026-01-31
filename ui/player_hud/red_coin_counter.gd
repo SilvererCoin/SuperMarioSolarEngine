@@ -3,7 +3,7 @@ extends Control
 
 @export var max_count: int:
 	set(val):
-		max_count = clamp(val, 0, INF)
+		max_count = clamp(val, 0, 999)
 
 		if is_instance_valid(label):
 			_update_label(false)
@@ -23,6 +23,8 @@ extends Control
 
 var call_count: int = 0
 
+var init_pos_y: float = 0.0
+
 
 func _ready() -> void:
 	# This signal gets added to the root in the main coin counter.
@@ -30,9 +32,11 @@ func _ready() -> void:
 
 	max_count = Coin.total_reds
 
+	init_pos_y = label.position.y
 
-func _increment(type: Coin.COIN_TYPE):
-	if not type == Coin.COIN_TYPE.RED: return
+
+func _increment(type: Coin.TYPE):
+	if not type == Coin.TYPE.RED: return
 
 	coin_count += 1
 
@@ -43,14 +47,14 @@ func _update_label(do_animation: bool) -> void:
 	# The logic underneath this return is purely for the bounce and color modulate animation.
 	if not do_animation: return
 
-	label.position.y = -bounce_height
+	label.position.y -= bounce_height
 	label.modulate = bounce_color
 
 	call_count += 1
 
 	while (label.position.y != 0 or label.modulate != Color.WHITE) and call_count == 1:
 		var delta: float = get_process_delta_time()
-		label.position.y = Math.lerp_fr(label.position.y, 0, 15 * delta, 0.01)
+		label.position.y = Math.lerp_fr(label.position.y, init_pos_y, 15 * delta, 0.01)
 		label.modulate = Math.lerp_colr(label.modulate, Color.WHITE, 5 * delta, 0.01)
 		await Engine.get_main_loop().process_frame
 

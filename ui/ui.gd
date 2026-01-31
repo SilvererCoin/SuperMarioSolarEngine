@@ -23,7 +23,6 @@ var current_notifs: Array = []
 @export_category(&"Debug Variables")
 @export var debug: Control
 @export var debug_label: Label
-@export var commit_label: Label
 @export var input_display: Control
 var displayed_inputs: Dictionary[String, TextureRect]
 

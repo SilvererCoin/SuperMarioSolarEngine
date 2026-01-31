@@ -471,7 +471,7 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_r0xoq"]
 
-[node name="UI" type="CanvasLayer" node_paths=PackedStringArray("life_meter", "screen_manager", "color_blur", "zoom_blur_player", "notif_list", "debug", "debug_label", "commit_label", "input_display")]
+[node name="UI" type="CanvasLayer" node_paths=PackedStringArray("life_meter", "screen_manager", "color_blur", "zoom_blur_player", "notif_list", "debug", "debug_label", "input_display")]
 process_mode = 3
 layer = 0
 script = ExtResource("1_75fsn")
@@ -485,7 +485,6 @@ notif_scene = ExtResource("4_oqxfb")
 notif_list = NodePath("Notifications")
 debug = NodePath("Debug")
 debug_label = NodePath("Debug/DebugLabel")
-commit_label = NodePath("")
 input_display = NodePath("Debug/InputDisplay")
 
 [node name="BackBufferFront" type="BackBufferCopy" parent="."]
@@ -512,8 +511,8 @@ libraries = {
 
 [node name="RedCoinCounter" parent="." groups=["HUD"] instance=ExtResource("6_6apma")]
 anchors_preset = -1
-offset_top = 45.0
-offset_bottom = 50.0
+offset_top = 37.0
+offset_bottom = 66.0
 script = ExtResource("7_aeygf")
 max_count = 0
 bounce_color = Color(1, 0, 0, 1)
@@ -521,7 +520,8 @@ bounce_color = Color(1, 0, 0, 1)
 [node name="TextureRect" parent="RedCoinCounter/CoinIcon/Gradient" index="0"]
 texture = SubResource("GradientTexture2D_m3cpd")
 
-[node name="Count" parent="RedCoinCounter" index="1"]
+[node name="Count" parent="RedCoinCounter" index="2"]
+modulate = Color(1, 0.98678994, 0.98678994, 1)
 text = "0/0"
 
 [node name="MusicLabel" type="Label" parent="." node_paths=PackedStringArray("anime")]
@@ -579,10 +579,7 @@ layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
-offset_left = 15.0
-offset_top = -33.0
-offset_right = 132.0
-offset_bottom = -15.0
+offset_top = -30.0
 grow_vertical = 0
 theme_override_constants/separation = 8
 

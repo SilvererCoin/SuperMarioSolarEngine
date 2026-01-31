@@ -109,6 +109,8 @@ func _on_transition_to(_handover: Variant) -> void:
 
 	TransitionManager.greenlight_load_in()
 
+	print("Loaded: %s" % level.name)
+
 
 func _on_transition_from() -> void:
 	pass
