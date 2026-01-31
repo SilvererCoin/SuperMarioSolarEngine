@@ -48,6 +48,15 @@ gradient = SubResource("Gradient_4rbya")
 fill_from = Vector2(0, 1)
 fill_to = Vector2(0, 0)
 
+[sub_resource type="Environment" id="Environment_vugs5"]
+background_mode = 3
+background_canvas_max_layer = -4
+tonemap_white = 7.41
+glow_enabled = true
+adjustment_enabled = true
+adjustment_brightness = 0.5
+adjustment_saturation = 1.2
+
 [sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_oe8qa"]
 blend_mode = 3
 
@@ -84,7 +93,7 @@ metadata/_edit_use_anchors_ = true
 [node name="Stars" type="GPUParticles2D" parent="ParallaxBackground/Sky"]
 material = SubResource("CanvasItemMaterial_47xr2")
 position = Vector2(1024, 256)
-amount = 2000
+amount = 3000
 texture = ExtResource("4_fkliv")
 fixed_fps = 0
 visibility_rect = Rect2(-512, -128, 1024, 256)
@@ -92,6 +101,7 @@ draw_order = 0
 process_material = SubResource("ParticleProcessMaterial_8i7lr")
 
 [node name="Sun" type="TextureRect" parent="ParallaxBackground"]
+modulate = Color(1.7269721, 1.7269721, 1.7269721, 1)
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -135,7 +145,7 @@ grow_horizontal = 2
 grow_vertical = 0
 texture = SubResource("GradientTexture2D_ko2tk")
 script = ExtResource("1_dubgv")
-line_color = Color(0.376471, 0.0901961, 0.858824, 1)
+line_color = Color(2.454227, 1.1857394, 2.454227, 1)
 scroll_divisor = 20.0
 
 [node name="Parallax2D" type="Parallax2D" parent="ParallaxBackground"]
