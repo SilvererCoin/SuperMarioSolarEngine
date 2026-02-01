@@ -1,4 +1,4 @@
-[gd_scene load_steps=306 format=3 uid="uid://dgqp3sqvmcvpu"]
+[gd_scene format=3 uid="uid://dgqp3sqvmcvpu"]
 
 [ext_resource type="Script" uid="uid://bg4t154sge7br" path="res://entities/player/shared/player.gd" id="1_87j6i"]
 [ext_resource type="Texture2D" uid="uid://cargcb2py1wcg" path="res://entities/player/shared/fludd/fludd.png" id="2_e1ut2"]
@@ -2284,7 +2284,7 @@ fludd_animation = "default"
 fludd_offset = Vector2i(0, 5)
 metadata/_custom_type_script = "uid://cb4g1yl24gj7m"
 
-[node name="Mario" type="CharacterBody2D" node_paths=PackedStringArray("doll", "fludd_f", "fludd_b", "state_manager", "movement", "input", "push_rays", "hitbox", "dive_hitbox", "small_hitbox", "water_check", "auto_crouch_check", "dive_hurtbox", "spin_hurtbox", "crouch_spin_hurtbox", "stomp_hurtbox", "gp_hurtbox")]
+[node name="Mario" type="CharacterBody2D" unique_id=63323883 node_paths=PackedStringArray("doll", "fludd_f", "fludd_b", "state_manager", "movement", "input", "push_rays", "hitbox", "dive_hitbox", "small_hitbox", "water_check", "auto_crouch_check", "dive_hurtbox", "spin_hurtbox", "crouch_spin_hurtbox", "stomp_hurtbox", "gp_hurtbox")]
 material = SubResource("ShaderMaterial_wdv80")
 collision_layer = 2
 floor_constant_speed = true
@@ -2310,7 +2310,7 @@ crouch_spin_hurtbox = NodePath("Areas/CrouchSpinHurtBox")
 stomp_hurtbox = NodePath("Areas/StompHurtBox")
 gp_hurtbox = NodePath("Areas/GroundpoundHurtBox")
 
-[node name="FluddStamina" parent="." instance=ExtResource("2_ijnwc")]
+[node name="FluddStamina" parent="." unique_id=1122110821 instance=ExtResource("2_ijnwc")]
 z_index = 10
 z_as_relative = false
 offset_left = -32.0
@@ -2318,138 +2318,138 @@ offset_top = -50.0
 offset_right = -15.0
 offset_bottom = -33.0
 
-[node name="FluddBehind" type="AnimatedSprite2D" parent="."]
+[node name="FluddBehind" type="AnimatedSprite2D" parent="." unique_id=605325507]
 visible = false
 position = Vector2(0, -24)
 sprite_frames = SubResource("SpriteFrames_e1ut2")
 
-[node name="Doll" type="AnimatedSprite2D" parent="."]
+[node name="Doll" type="AnimatedSprite2D" parent="." unique_id=1876045562]
 position = Vector2(0, -24)
 sprite_frames = ExtResource("4_xenv0")
 animation = &"wallslide"
 metadata/last_previewed = SubResource("Resource_cpqj3")
 
-[node name="FluddInfront" type="AnimatedSprite2D" parent="."]
+[node name="FluddInfront" type="AnimatedSprite2D" parent="." unique_id=1928286412]
 visible = false
 position = Vector2(0, -24)
 sprite_frames = SubResource("SpriteFrames_1i10v")
 
-[node name="Hitbox" type="CollisionShape2D" parent="."]
+[node name="Hitbox" type="CollisionShape2D" parent="." unique_id=76578262]
 position = Vector2(0, -15)
 shape = SubResource("RectangleShape2D_u4b58")
 
-[node name="SmallHitbox" type="CollisionShape2D" parent="."]
+[node name="SmallHitbox" type="CollisionShape2D" parent="." unique_id=607470811]
 position = Vector2(0, -8)
 shape = SubResource("RectangleShape2D_1emcl")
 
-[node name="DiveHitbox" type="CollisionShape2D" parent="."]
+[node name="DiveHitbox" type="CollisionShape2D" parent="." unique_id=1433610282]
 position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_c86nk")
 
-[node name="Areas" type="Node2D" parent="."]
+[node name="Areas" type="Node2D" parent="." unique_id=987704991]
 visible = false
 
-[node name="WaterCheck" type="Area2D" parent="Areas"]
+[node name="WaterCheck" type="Area2D" parent="Areas" unique_id=1379696043]
 position = Vector2(0, -24)
 collision_layer = 0
 collision_mask = 16
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Areas/WaterCheck"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Areas/WaterCheck" unique_id=200193675]
 position = Vector2(0, 8)
 shape = SubResource("RectangleShape2D_gw1ji")
 debug_color = Color(1, 1, 1, 0.41960785)
 
-[node name="AutoCrouchCheck" type="Area2D" parent="Areas"]
+[node name="AutoCrouchCheck" type="Area2D" parent="Areas" unique_id=904647441]
 collision_layer = 0
 script = ExtResource("39_n5dp2")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Areas/AutoCrouchCheck"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Areas/AutoCrouchCheck" unique_id=615935451]
 position = Vector2(0, -23)
 shape = SubResource("RectangleShape2D_2tafv")
 debug_color = Color(1, 1, 1, 0.41960785)
 
-[node name="DiveHurtBox" type="Area2D" parent="Areas"]
+[node name="DiveHurtBox" type="Area2D" parent="Areas" unique_id=1265191908]
 collision_layer = 65536
 collision_mask = 132
 monitoring = false
 
-[node name="DamageBox" type="CollisionShape2D" parent="Areas/DiveHurtBox"]
+[node name="DamageBox" type="CollisionShape2D" parent="Areas/DiveHurtBox" unique_id=1158604279]
 position = Vector2(0, -16)
 shape = SubResource("RectangleShape2D_8wyc1")
 debug_color = Color(1, 0, 0.14509805, 0.14117648)
 
-[node name="SpinHurtBox" type="Area2D" parent="Areas"]
+[node name="SpinHurtBox" type="Area2D" parent="Areas" unique_id=859219720]
 collision_layer = 65536
 collision_mask = 132
 monitoring = false
 
-[node name="DamageBox" type="CollisionShape2D" parent="Areas/SpinHurtBox"]
+[node name="DamageBox" type="CollisionShape2D" parent="Areas/SpinHurtBox" unique_id=1525664272]
 position = Vector2(0, -13)
 shape = SubResource("RectangleShape2D_gh08o")
 debug_color = Color(1, 0, 0.145098, 0.141176)
 
-[node name="CrouchSpinHurtBox" type="Area2D" parent="Areas"]
+[node name="CrouchSpinHurtBox" type="Area2D" parent="Areas" unique_id=566192472]
 collision_layer = 65536
 collision_mask = 132
 monitoring = false
 
-[node name="DamageBox" type="CollisionShape2D" parent="Areas/CrouchSpinHurtBox"]
+[node name="DamageBox" type="CollisionShape2D" parent="Areas/CrouchSpinHurtBox" unique_id=63375618]
 position = Vector2(0, -6)
 shape = SubResource("RectangleShape2D_f3xbj")
 debug_color = Color(1, 0, 0.145098, 0.141176)
 
-[node name="StompHurtBox" type="Area2D" parent="Areas"]
+[node name="StompHurtBox" type="Area2D" parent="Areas" unique_id=274533302]
 collision_layer = 65536
 collision_mask = 132
 monitoring = false
 
-[node name="DamageBox" type="CollisionShape2D" parent="Areas/StompHurtBox"]
+[node name="DamageBox" type="CollisionShape2D" parent="Areas/StompHurtBox" unique_id=210769870]
 position = Vector2(0, -4)
 shape = SubResource("SegmentShape2D_8wyc1")
 debug_color = Color(1, 0, 0.14509805, 0.14117648)
 
-[node name="GroundpoundHurtBox" type="Area2D" parent="Areas"]
+[node name="GroundpoundHurtBox" type="Area2D" parent="Areas" unique_id=264507426]
 collision_layer = 65536
 collision_mask = 128
 monitoring = false
 
-[node name="DamageBox" type="CollisionShape2D" parent="Areas/GroundpoundHurtBox"]
+[node name="DamageBox" type="CollisionShape2D" parent="Areas/GroundpoundHurtBox" unique_id=498226004]
 position = Vector2(0, 5)
 shape = SubResource("RectangleShape2D_hx7ue")
 debug_color = Color(1, 0, 0.14509805, 0.14117648)
 
-[node name="PushRays" type="Node2D" parent="." node_paths=PackedStringArray("movement", "body_catcher_r")]
+[node name="PushRays" type="Node2D" parent="." unique_id=1784088761 node_paths=PackedStringArray("movement", "body_catcher_r")]
 script = ExtResource("35_g7d1t")
 movement = NodePath("../Movement")
 body_catcher_r = NodePath("BodyCatcherR")
 
-[node name="PushRayR" type="RayCast2D" parent="PushRays"]
+[node name="PushRayR" type="RayCast2D" parent="PushRays" unique_id=1663081798]
 modulate = Color(1, 1, 0.164706, 1)
 position = Vector2(0, -14)
 target_position = Vector2(16, 0)
 collision_mask = 9
 
-[node name="BodyCatcherR" type="Area2D" parent="PushRays"]
+[node name="BodyCatcherR" type="Area2D" parent="PushRays" unique_id=953869304]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PushRays/BodyCatcherR"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PushRays/BodyCatcherR" unique_id=1601673546]
 shape = SubResource("SegmentShape2D_hx7ue")
 
-[node name="PushRayL" type="RayCast2D" parent="PushRays"]
+[node name="PushRayL" type="RayCast2D" parent="PushRays" unique_id=47819236]
 modulate = Color(1, 1, 0.164706, 1)
 position = Vector2(0, -14)
 target_position = Vector2(-16, 0)
 collision_mask = 9
 
-[node name="BodyCatcherL" type="Area2D" parent="PushRays"]
+[node name="BodyCatcherL" type="Area2D" parent="PushRays" unique_id=1658816335]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PushRays/BodyCatcherL"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PushRays/BodyCatcherL" unique_id=1613601935]
 shape = SubResource("SegmentShape2D_hx7ue")
 
-[node name="InputManager" type="Node" parent="."]
+[node name="InputManager" type="Node" parent="." unique_id=2062236729]
 script = ExtResource("21_onm15")
 buffer_duration = 6
 
-[node name="FluddManager" type="Node" parent="." node_paths=PackedStringArray("actor", "stamina_bar", "fludd_b", "fludd_f", "spray_player")]
+[node name="FluddManager" type="Node" parent="." unique_id=2015663485 node_paths=PackedStringArray("actor", "stamina_bar", "fludd_b", "fludd_f", "spray_player")]
 script = ExtResource("151_4womg")
 hover_effectiveness = SubResource("Curve_u3pyw")
 hover_spray_sfx = ExtResource("10_8wyc1")
@@ -2461,11 +2461,11 @@ spray_player = NodePath("Spray")
 toggle_sfx = ExtResource("9_1vsdu")
 switch_sfx = ExtResource("10_4t2h7")
 
-[node name="Spray" type="AudioStreamPlayer" parent="FluddManager"]
+[node name="Spray" type="AudioStreamPlayer" parent="FluddManager" unique_id=1310138518]
 stream = ExtResource("10_8wyc1")
 bus = &"Motion"
 
-[node name="Movement" type="Node" parent="." node_paths=PackedStringArray("actor")]
+[node name="Movement" type="Node" parent="." unique_id=1261744189 node_paths=PackedStringArray("actor")]
 script = ExtResource("37_quca3")
 actor = NodePath("..")
 max_speed = 3.0
@@ -2475,60 +2475,60 @@ snap_length = 8.0
 swim_speed = 3.0
 min_slide_incline = 0.4
 
-[node name="StateManager" type="Node" parent="." node_paths=PackedStringArray("input", "movement", "target_actor", "initial_state")]
+[node name="StateManager" type="Node" parent="." unique_id=1337517111 node_paths=PackedStringArray("input", "movement", "target_actor", "initial_state")]
 script = ExtResource("38_vxs65")
 input = NodePath("../InputManager")
 movement = NodePath("../Movement")
 target_actor = NodePath("..")
 initial_state = NodePath("Dry/Airborne")
 
-[node name="Submerged" type="Node" parent="StateManager"]
+[node name="Submerged" type="Node" parent="StateManager" unique_id=1867232950]
 script = ExtResource("135_2utkk")
 
-[node name="SwimIdle" type="Node" parent="StateManager/Submerged"]
+[node name="SwimIdle" type="Node" parent="StateManager/Submerged" unique_id=336730267]
 script = ExtResource("40_aeui7")
 decel_time = 45
 hitbox_type = "Dive"
 animation_data = SubResource("Resource_u4fjx")
 
-[node name="Swim" type="Node" parent="StateManager/Submerged"]
+[node name="Swim" type="Node" parent="StateManager/Submerged" unique_id=154393623]
 script = ExtResource("41_x14c0")
 hitbox_type = "Dive"
 animation_data = SubResource("Resource_mqps4")
 
-[node name="SwimHard" type="Node" parent="StateManager/Submerged"]
+[node name="SwimHard" type="Node" parent="StateManager/Submerged" unique_id=1273972862]
 script = ExtResource("42_7ru02")
 extra_boost_speed = 0.5
 hitbox_type = "Dive"
 animation_data = SubResource("Resource_q75g6")
 
-[node name="SwimFlutter" type="Node" parent="StateManager/Submerged"]
+[node name="SwimFlutter" type="Node" parent="StateManager/Submerged" unique_id=587771832]
 script = ExtResource("46_ukpqj")
 hitbox_type = "Dive"
 animation_data = SubResource("Resource_hnhty")
 
-[node name="SwimSpin" type="Node" parent="StateManager/Submerged"]
+[node name="SwimSpin" type="Node" parent="StateManager/Submerged" unique_id=288718187]
 script = ExtResource("43_vu16w")
 extra_boost_speed = 2.0
 hitbox_type = "Dive"
 animation_data = SubResource("Resource_ata35")
 
-[node name="Dry" type="Node" parent="StateManager"]
+[node name="Dry" type="Node" parent="StateManager" unique_id=1124314852]
 script = ExtResource("40_q8vpo")
 
-[node name="Grounded" type="Node" parent="StateManager/Dry"]
+[node name="Grounded" type="Node" parent="StateManager/Dry" unique_id=682138068]
 script = ExtResource("40_s2gar")
 hitbox_type = "None"
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_n4l32")])
 on_enter = false
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_r5xry"), SubResource("Resource_efjxb")])
 
-[node name="Idle" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Idle" type="Node" parent="StateManager/Dry/Grounded" unique_id=1104727765]
 script = ExtResource("44_87kyt")
 idle_animation_data = SubResource("Resource_cpqj3")
 lookup_animation_data = SubResource("Resource_xh3w7")
 
-[node name="Walk" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Walk" type="Node" parent="StateManager/Dry/Grounded" unique_id=505074340]
 script = ExtResource("45_ka4vl")
 footstep_frames = Array[int]([0, 4])
 walk_animation_data = SubResource("Resource_1i10v")
@@ -2537,40 +2537,40 @@ particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_cej6f")])
 on_enter = false
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_8p2oq"), SubResource("Resource_efjxb")])
 
-[node name="Skid" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Skid" type="Node" parent="StateManager/Dry/Grounded" unique_id=402900983]
 script = ExtResource("48_w11sb")
 skid_accel_time = 8.0
 over_accel = 1.0
 animation_data = SubResource("Resource_1vsdu")
 
-[node name="Push" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Push" type="Node" parent="StateManager/Dry/Grounded" unique_id=1888659466]
 script = ExtResource("49_6rakc")
 animation_data = SubResource("Resource_4t2h7")
 
-[node name="DryPush" type="Node" parent="StateManager/Dry/Grounded/Push"]
+[node name="DryPush" type="Node" parent="StateManager/Dry/Grounded/Push" unique_id=1295158595]
 script = ExtResource("50_xkq61")
 animation_data = SubResource("Resource_e1ut2")
 
-[node name="Cheer" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Cheer" type="Node" parent="StateManager/Dry/Grounded" unique_id=772890992]
 script = ExtResource("57_p7lxf")
 animation_data = SubResource("Resource_ijnwc")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_sitp4")])
 
-[node name="Crouch" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Crouch" type="Node" parent="StateManager/Dry/Grounded" unique_id=62433339]
 script = ExtResource("51_38is8")
 hitbox_type = "Small"
 animation_data = SubResource("Resource_8wyc1")
 on_enter = false
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_ql55k")])
 
-[node name="CrouchSpin" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="CrouchSpin" type="Node" parent="StateManager/Dry/Grounded" unique_id=1319199042]
 script = ExtResource("54_rxsl3")
 hitbox_type = "Small"
 animation_data = SubResource("Resource_hx7ue")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_ttikd")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_upqlf")])
 
-[node name="Waddle" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="Waddle" type="Node" parent="StateManager/Dry/Grounded" unique_id=1080692194]
 script = ExtResource("53_blm5r")
 footstep_frames = Array[int]([1, 3])
 hitbox_type = "Small"
@@ -2578,34 +2578,34 @@ animation_data = SubResource("Resource_f3xbj")
 on_enter = false
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_lybx2")])
 
-[node name="DiveSlide" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="DiveSlide" type="Node" parent="StateManager/Dry/Grounded" unique_id=1203706806]
 script = ExtResource("60_d4aqs")
 hitbox_type = "Dive"
 animation_data = SubResource("Resource_xenv0")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_w3gxr")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_2mqoj")])
 
-[node name="GroundPoundLand" type="Node" parent="StateManager/Dry/Grounded"]
+[node name="GroundPoundLand" type="Node" parent="StateManager/Dry/Grounded" unique_id=188243621]
 script = ExtResource("58_qbwc7")
 hitbox_type = "Small"
 animation_data = SubResource("Resource_wdv80")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_bbld7")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_t5lrn")])
 
-[node name="Airborne" type="Node" parent="StateManager/Dry"]
+[node name="Airborne" type="Node" parent="StateManager/Dry" unique_id=728681617]
 script = ExtResource("61_1r6ji")
 hitbox_type = "None"
 on_enter = false
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_oau5y")])
 
-[node name="JumpStates" type="Node" parent="StateManager/Dry/Airborne"]
+[node name="JumpStates" type="Node" parent="StateManager/Dry/Airborne" unique_id=110819261]
 script = ExtResource("73_acu3g")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_kvfvp")])
 
-[node name="DummyJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="DummyJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=66212913]
 script = ExtResource("65_6w5qc")
 
-[node name="Jump" type="Node" parent="StateManager/Dry/Airborne/JumpStates/DummyJump" node_paths=PackedStringArray("fall_state")]
+[node name="Jump" type="Node" parent="StateManager/Dry/Airborne/JumpStates/DummyJump" unique_id=7423888 node_paths=PackedStringArray("fall_state")]
 script = ExtResource("66_2qkrt")
 jump_power = 5.3
 min_jump_percent = 20.0
@@ -2614,7 +2614,7 @@ fall_state = NodePath("../../../FallStates/Fall")
 animation_data = SubResource("Resource_gacnc")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_2esv2"), SubResource("Resource_qmxtc")])
 
-[node name="DoubleJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates/DummyJump" node_paths=PackedStringArray("fall_state")]
+[node name="DoubleJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates/DummyJump" unique_id=2019446783 node_paths=PackedStringArray("fall_state")]
 script = ExtResource("75_nf276")
 jump_power = 6.7
 min_jump_percent = 35.0
@@ -2623,14 +2623,14 @@ fall_state = NodePath("../../../FallStates/DoubleFall")
 animation_data = SubResource("Resource_txrxb")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_js1ac"), SubResource("Resource_cjrlj")])
 
-[node name="TripleJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates/DummyJump"]
+[node name="TripleJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates/DummyJump" unique_id=1251492730]
 script = ExtResource("82_h02h3")
 jump_power = 8.0
 min_jump_percent = 50.0
 animation_data = SubResource("Resource_2siud")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_c6n5s"), SubResource("Resource_0beus"), SubResource("Resource_32052")])
 
-[node name="Spinjump" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="Spinjump" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=1140773851]
 script = ExtResource("92_pwmyp")
 jump_power = 6.7
 min_jump_percent = 100.0
@@ -2638,7 +2638,7 @@ jump_number = 2
 animation_data = SubResource("Resource_pakf6")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_h8xfq"), SubResource("Resource_sxalk")])
 
-[node name="Longjump" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="Longjump" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=1781876804]
 script = ExtResource("100_6d35n")
 jump_power = 3.6
 push_power = 6.0
@@ -2647,19 +2647,19 @@ backward_accel_time = 30
 animation_data = SubResource("Resource_ufl2i")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_5f3i0"), SubResource("Resource_s1bjj")])
 
-[node name="Sideflip" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="Sideflip" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=1494292787]
 script = ExtResource("101_4gu6d")
 jump_power = 7.2
 animation_data = SubResource("Resource_m576x")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_ts3h6"), SubResource("Resource_foa8p")])
 
-[node name="Backflip" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="Backflip" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=502392670]
 script = ExtResource("103_ky35g")
 jump_power = 7.5
 animation_data = SubResource("Resource_2h0ab")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_yrs16"), SubResource("Resource_l81lv")])
 
-[node name="ButtSlideJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="ButtSlideJump" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=1501405754]
 script = ExtResource("104_py71u")
 jump_power = 5.3
 min_jump_percent = 20.0
@@ -2667,28 +2667,28 @@ jump_number = 1
 animation_data = SubResource("Resource_o485y")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_jo8kb")])
 
-[node name="WallBoost" type="Node" parent="StateManager/Dry/Airborne/JumpStates"]
+[node name="WallBoost" type="Node" parent="StateManager/Dry/Airborne/JumpStates" unique_id=18307691]
 script = ExtResource("113_s1bjj")
 jump_power = 6.9
 animation_data = SubResource("Resource_gacnc")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_5gjtv")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_nl575"), SubResource("Resource_a2hl0")])
 
-[node name="AfterimageModule" parent="StateManager/Dry/Airborne/JumpStates/WallBoost" node_paths=PackedStringArray("actor") instance=ExtResource("120_f3xbj")]
+[node name="AfterimageModule" parent="StateManager/Dry/Airborne/JumpStates/WallBoost" unique_id=1445023674 node_paths=PackedStringArray("actor") instance=ExtResource("120_f3xbj")]
 actor = NodePath("../../../../../..")
 afterimage_color = Color(1, 0, 0, 1)
 afterimage_cooldown = 8
 afterimage_offset = Vector2(-10, -10)
 
-[node name="LazyJump" type="Node" parent="StateManager/Dry/Airborne"]
+[node name="LazyJump" type="Node" parent="StateManager/Dry/Airborne" unique_id=1658306375]
 script = ExtResource("116_wolak")
 jump_data = SubResource("Resource_gacnc")
 fall_data = SubResource("Resource_ngcav")
 
-[node name="WalljumpStates" type="Node" parent="StateManager/Dry/Airborne"]
+[node name="WalljumpStates" type="Node" parent="StateManager/Dry/Airborne" unique_id=11447285]
 script = ExtResource("73_acu3g")
 
-[node name="Wallslide" type="Node" parent="StateManager/Dry/Airborne/WalljumpStates"]
+[node name="Wallslide" type="Node" parent="StateManager/Dry/Airborne/WalljumpStates" unique_id=643447574]
 script = ExtResource("105_6ryk6")
 term_vel = 3.0
 gravity_friction = 4.0
@@ -2696,58 +2696,58 @@ animation_data = SubResource("Resource_86kn8")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_2nx7x"), SubResource("Resource_5idsp")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_w3vn1")])
 
-[node name="Walljump" type="Node" parent="StateManager/Dry/Airborne/WalljumpStates"]
+[node name="Walljump" type="Node" parent="StateManager/Dry/Airborne/WalljumpStates" unique_id=1733765310]
 script = ExtResource("90_0xuyq")
 jump_power = 5.3
 push_power = 4.0
 animation_data = SubResource("Resource_mk8bu")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_pq6ep"), SubResource("Resource_a2hl0")])
 
-[node name="SpinWallbonk" type="Node" parent="StateManager/Dry/Airborne/WalljumpStates"]
+[node name="SpinWallbonk" type="Node" parent="StateManager/Dry/Airborne/WalljumpStates" unique_id=1750358578]
 script = ExtResource("109_w8m04")
 wall_kickback_power_y = 1.5
 animation_data = SubResource("Resource_wc0bq")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_bloag"), SubResource("Resource_2nfvq")])
 
-[node name="FallStates" type="Node" parent="StateManager/Dry/Airborne"]
+[node name="FallStates" type="Node" parent="StateManager/Dry/Airborne" unique_id=652259390]
 script = ExtResource("73_acu3g")
 
-[node name="Fall" type="Node" parent="StateManager/Dry/Airborne/FallStates"]
+[node name="Fall" type="Node" parent="StateManager/Dry/Airborne/FallStates" unique_id=725554396]
 script = ExtResource("113_j3k6p")
 animation_data = SubResource("Resource_ngcav")
 
-[node name="Freefall" type="Node" parent="StateManager/Dry/Airborne/FallStates"]
+[node name="Freefall" type="Node" parent="StateManager/Dry/Airborne/FallStates" unique_id=929074446]
 script = ExtResource("114_mgnux")
 animation_data = SubResource("Resource_wihps")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_5kqsg")])
 
-[node name="DoubleFall" type="Node" parent="StateManager/Dry/Airborne/FallStates"]
+[node name="DoubleFall" type="Node" parent="StateManager/Dry/Airborne/FallStates" unique_id=173280740]
 script = ExtResource("113_j3k6p")
 animation_data = SubResource("Resource_saqqr")
 
-[node name="GroundPoundStates" type="Node" parent="StateManager/Dry/Airborne"]
+[node name="GroundPoundStates" type="Node" parent="StateManager/Dry/Airborne" unique_id=1537413182]
 script = ExtResource("73_acu3g")
 
-[node name="GroundPound" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates"]
+[node name="GroundPound" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates" unique_id=82336971]
 script = ExtResource("107_us6gm")
 linger_time = 5.0
 animation_data = SubResource("Resource_bsr1j")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_7r27p"), SubResource("Resource_rgxnc")])
 
-[node name="GroundPoundFall" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates"]
+[node name="GroundPoundFall" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates" unique_id=857633780]
 script = ExtResource("111_fyebu")
 animation_data = SubResource("Resource_qbnhj")
 
-[node name="AfterimageModule" parent="StateManager/Dry/Airborne/GroundPoundStates/GroundPoundFall" node_paths=PackedStringArray("actor") instance=ExtResource("120_f3xbj")]
+[node name="AfterimageModule" parent="StateManager/Dry/Airborne/GroundPoundStates/GroundPoundFall" unique_id=1104081810 node_paths=PackedStringArray("actor") instance=ExtResource("120_f3xbj")]
 actor = NodePath("../../../../../..")
 afterimage_color = Color(1, 0, 0, 1)
 afterimage_offset = Vector2(0, -32)
 
-[node name="GroundPoundCancel" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates"]
+[node name="GroundPoundCancel" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates" unique_id=1440375576]
 script = ExtResource("112_02mke")
 animation_data = SubResource("Resource_ngcav")
 
-[node name="GroundPoundJump" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates" node_paths=PackedStringArray("fall_state")]
+[node name="GroundPoundJump" type="Node" parent="StateManager/Dry/Airborne/GroundPoundStates" unique_id=1346335720 node_paths=PackedStringArray("fall_state")]
 script = ExtResource("105_g4v7o")
 jump_power = 6.7
 min_jump_percent = 35.0
@@ -2757,23 +2757,23 @@ animation_data = SubResource("Resource_np2tc")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_kvfvp")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_8711x"), SubResource("Resource_nl575")])
 
-[node name="Twirl" type="Node" parent="StateManager/Dry/Airborne"]
+[node name="Twirl" type="Node" parent="StateManager/Dry/Airborne" unique_id=1862908862]
 script = ExtResource("124_swcs3")
 spin_power = 0.0
 animation_data = SubResource("Resource_wc0bq")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_2y8iw")])
 
-[node name="Spin" type="Node" parent="StateManager/Dry"]
+[node name="Spin" type="Node" parent="StateManager/Dry" unique_id=118406051]
 script = ExtResource("135_qf53u")
 spin_power = 3.0
 animation_data = SubResource("Resource_wc0bq")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_totbj")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_vehmo"), SubResource("Resource_0hpnu")])
 
-[node name="DiveStates" type="Node" parent="StateManager/Dry"]
+[node name="DiveStates" type="Node" parent="StateManager/Dry" unique_id=1442121945]
 script = ExtResource("73_acu3g")
 
-[node name="Dive" type="Node" parent="StateManager/Dry/DiveStates"]
+[node name="Dive" type="Node" parent="StateManager/Dry/DiveStates" unique_id=1783448395]
 script = ExtResource("134_dsbpr")
 x_power = 3.2
 bellyflop_power = 2.8
@@ -2782,7 +2782,7 @@ hitbox_type = "Dive"
 animation_data = SubResource("Resource_u3pyw")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_lib4c"), SubResource("Resource_6roi5")])
 
-[node name="Rollout" type="Node" parent="StateManager/Dry/DiveStates"]
+[node name="Rollout" type="Node" parent="StateManager/Dry/DiveStates" unique_id=1320544296]
 script = ExtResource("129_e0h20")
 x_multiplier = 1.2
 accel_cap = 8.0
@@ -2793,7 +2793,7 @@ animation_data = SubResource("Resource_cootw")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_rb2f4")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_4xwjg")])
 
-[node name="SuperRollout" type="Node" parent="StateManager/Dry/DiveStates"]
+[node name="SuperRollout" type="Node" parent="StateManager/Dry/DiveStates" unique_id=362376650]
 script = ExtResource("150_4duxu")
 x_power = 3.2
 x_multiplier = 1.2
@@ -2806,19 +2806,19 @@ animation_data = SubResource("Resource_ae2dx")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_44n4o"), SubResource("Resource_c5q6a")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_m87ta")])
 
-[node name="AfterimageModule" parent="StateManager/Dry/DiveStates/SuperRollout" node_paths=PackedStringArray("actor") instance=ExtResource("120_f3xbj")]
+[node name="AfterimageModule" parent="StateManager/Dry/DiveStates/SuperRollout" unique_id=1179600388 node_paths=PackedStringArray("actor") instance=ExtResource("120_f3xbj")]
 actor = NodePath("../../../../..")
 afterimage_color = Color(1, 0, 0, 1)
 afterimage_cooldown = 7
 afterimage_offset = Vector2(-32, -32)
 
-[node name="Bonk" type="Node" parent="StateManager/Dry/DiveStates"]
+[node name="Bonk" type="Node" parent="StateManager/Dry/DiveStates" unique_id=348195047]
 script = ExtResource("131_f03w0")
 rotation_time = 45.0
 animation_data = SubResource("Resource_qko5d")
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_ujdp5"), SubResource("Resource_pxspy")])
 
-[node name="ButtSlide" type="Node" parent="StateManager/Dry"]
+[node name="ButtSlide" type="Node" parent="StateManager/Dry" unique_id=720337721]
 script = ExtResource("140_lfmwr")
 speed = 12.5
 turn_forgiveness = 1.5
@@ -2832,7 +2832,7 @@ animation_data = SubResource("Resource_ifrah")
 particles = Array[ExtResource("55_bxnxc")]([SubResource("Resource_d3rr6")])
 sfx_layers = Array[ExtResource("49_apkmk")]([SubResource("Resource_mc84f")])
 
-[node name="Hit" type="Node" parent="StateManager/Dry"]
+[node name="Hit" type="Node" parent="StateManager/Dry" unique_id=795940851]
 process_mode = 3
 script = ExtResource("144_xenv0")
 freeze_time = 20

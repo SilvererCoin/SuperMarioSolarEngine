@@ -41,7 +41,7 @@ static func set_win_scale(new_scale):
 		# |             | |       |
 		# +-------------+ +-------+
 
-		var window_pos: Vector2i = screen_top_left + (screen_size - window_size) / 2
+		var window_pos: Vector2i = screen_top_left + Vector2i((screen_size - window_size) / 2.0)
 		DisplayServer.window_set_position(window_pos)
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)

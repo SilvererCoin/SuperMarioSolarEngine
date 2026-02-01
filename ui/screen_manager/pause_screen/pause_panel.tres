@@ -1,4 +1,4 @@
-[gd_resource type="VisualShader" load_steps=27 format=3 uid="uid://byfa3t51pf655"]
+[gd_resource type="VisualShader" format=3 uid="uid://byfa3t51pf655"]
 
 [sub_resource type="VisualShaderNodeFrame" id="VisualShaderNodeFrame_vgxyu"]
 size = Vector2(964, 318)
@@ -128,107 +128,6 @@ op_type = 0
 operator = 2
 
 [resource]
-code = "shader_type canvas_item;
-render_mode blend_mix;
-
-uniform vec2 background_scroll = vec2(-0.050000, 0.050000);
-uniform float modulate_alpha : hint_range(0.0, 1.0);
-uniform float spike_scroll_speed = 0.05000000074506;
-uniform vec2 spike_dimensions;
-uniform sampler2D spike_texture : filter_nearest, repeat_disable;
-
-
-
-void fragment() {
-// Input:6
-	float n_out6p0 = TIME;
-
-
-// Vector2Parameter:39
-	vec2 n_out39p0 = background_scroll;
-
-
-// VectorOp:9
-	vec2 n_out9p0 = vec2(n_out6p0) * n_out39p0;
-
-
-// UVFunc:8
-	vec2 n_in8p1 = vec2(1.00000, 1.00000);
-	vec2 n_out8p0 = n_out9p0 * n_in8p1 + UV;
-
-
-	vec4 n_out5p0;
-// Texture2D:5
-	n_out5p0 = texture(TEXTURE, n_out8p0);
-
-
-// FloatParameter:35
-	float n_out35p0 = modulate_alpha;
-
-
-// Input:47
-	vec2 n_out47p0 = UV;
-
-
-// Input:31
-	float n_out31p0 = TIME;
-
-
-// FloatParameter:37
-	float n_out37p0 = spike_scroll_speed;
-
-
-// FloatOp:33
-	float n_out33p0 = n_out31p0 * n_out37p0;
-
-
-// VectorCompose:54
-	float n_in54p0 = 0.00000;
-	vec2 n_out54p0 = vec2(n_in54p0, n_out33p0);
-
-
-// VectorOp:55
-	vec2 n_out55p0 = n_out47p0 + n_out54p0;
-
-
-// Input:40
-	vec2 n_out40p0 = TEXTURE_PIXEL_SIZE;
-
-
-// VectorOp:53
-	vec2 n_out53p0 = n_out55p0 / n_out40p0;
-
-
-// Vector2Parameter:36
-	vec2 n_out36p0 = spike_dimensions;
-
-
-// VectorOp:51
-	vec2 n_out51p0 = n_out53p0 / n_out36p0;
-
-
-// VectorOp:52
-	vec2 n_in52p1 = vec2(0.00000, 1.00000);
-	vec2 n_out52p0 = mod(n_out51p0, n_in52p1);
-
-
-	vec4 n_out24p0;
-// Texture2D:24
-	n_out24p0 = texture(spike_texture, n_out52p0);
-	float n_out24p4 = n_out24p0.a;
-
-
-// FloatOp:34
-	float n_out34p0 = n_out35p0 * n_out24p4;
-
-
-// Output:0
-	COLOR.rgb = vec3(n_out5p0.xyz);
-	COLOR.a = n_out34p0;
-
-
-}
-"
 mode = 1
 flags/light_only = false
 nodes/vertex/0/position = Vector2(1140, 520)
