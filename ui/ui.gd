@@ -137,6 +137,9 @@ func _push_notif(type: StringName, input: String):
 
 
 func _display_input(event: InputEvent):
+	if event is InputEventMouseMotion:
+		return
+
 	var event_name: String = IconMap.get_filtered_name(event)
 
 	var texture_rect := TextureRect.new()

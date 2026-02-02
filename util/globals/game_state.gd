@@ -1,7 +1,5 @@
 extends Node
 
-signal setting_initialised(key: String, value: Variant)
-
 signal paused
 
 enum Qualities {
@@ -36,15 +34,18 @@ func _ready():
 	)
 
 	# Run the logic of every setting on ready
-	setting_initialised.connect(_setting_changed.bind())
+	for section in LocalSettings.settings:
+		for key in LocalSettings.settings[section]:
+			_setting_changed(key, LocalSettings.load_setting(section, key))
+
 	# Run the logic of every setting when it is changed
 	LocalSettings.setting_changed.connect(_setting_changed.bind())
 
 	process_mode = Node.PROCESS_MODE_ALWAYS
 
-	buses[&"Music"].update_mute(LocalSettings.load_setting("Audio", "music_muted", false))
-	debug_toggle = LocalSettings.load_setting("Developer", "debug_toggle", false)
-	debug_toggle_collision_shapes = LocalSettings.load_setting("Developer", "debug_toggle_collision_shapes", false)
+	buses[&"Music"].update_mute(LocalSettings.load_setting("Audio", "music_muted"))
+	debug_toggle = LocalSettings.load_setting("Developer", "debug_toggle")
+	debug_toggle_collision_shapes = LocalSettings.load_setting("Developer", "debug_toggle_collision_shapes")
 
 
 func _unhandled_input(event):

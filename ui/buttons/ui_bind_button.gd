@@ -24,8 +24,6 @@ var bound_inputs: PackedStringArray
 var awaiting_input: bool = false
 var timeout_timer: SceneTreeTimer
 
-## The default input events as present in the project's [InputMap].
-var default_events: Array
 ## The inputs of the action filtered by the type of input.
 ## (I.e. [InputEventKey], [InputEventJoypadButton], ...)
 var filtered_events: Array[InputEvent]
@@ -37,31 +35,21 @@ func _ready() -> void:
 	focus_entered.connect(_focus_changed)
 	focus_exited.connect(_focus_changed)
 
-	var action_path: String = "input/" + action_name
-	var action_data: Dictionary = ProjectSettings.get(action_path)
-	default_events = action_data["events"]
+	LocalSettings.setting_changed.connect(_setting_changed)
 
 	# Delete all events attached to the [InputMap] by default so we have our own control.
 	InputMap.action_erase_events(action_name)
 
-	# If saved data is found, set the binding to that.
-	if LocalSettings.has_setting("Keyboard Bindings (Player: %d)" % 0, action_name):
-		var saved_data: PackedStringArray = LocalSettings.load_setting(
-			"Keyboard Bindings (Player: %d)" % 0,
-			action_name,
-			PackedStringArray()
-		)
+	var saved_data: PackedStringArray = LocalSettings.load_setting(
+		"Bindings", action_name
+	)
 
-		for event_name: String in saved_data:
-			var event: InputEvent = IconMap.get_associated_event(event_name)
-			_add_input(event, event_name)
+	for event_name: String in saved_data:
+		var event: InputEvent = IconMap.get_associated_event(event_name)
+
+		if _is_valid_event(event):
+			_add_input(event, event_name, false)
 			_add_icon(event)
-	# Otherwise, set it to the events defined in the project's [InputMap].
-	else:
-		for event: InputEvent in default_events:
-			if _is_valid_event(event):
-				_add_input(event, IconMap.get_filtered_name(event))
-				_add_icon(event)
 
 
 func _input(event: InputEvent) -> void:
@@ -95,8 +83,20 @@ func _focus_changed() -> void:
 	icons.material.set_shader_parameter(&"enabled", !has_focus())
 
 
+func _setting_changed(key: String, value: Variant) -> void:
+	if key == action_name:
+		_clear(false)
+
+		for event_name: String in value:
+			var event: InputEvent = IconMap.get_associated_event(event_name)
+
+			if _is_valid_event(event):
+				_add_input(event, event_name, false)
+				_add_icon(event)
+
+
 ## Adds the actual event to the project's [InputMap].
-func _add_input(event: InputEvent, event_name: String) -> void:
+func _add_input(event: InputEvent, event_name: String, change_setting: bool = true) -> void:
 	bound_inputs.append(event_name)
 	filtered_events.append(event)
 
@@ -107,11 +107,12 @@ func _add_input(event: InputEvent, event_name: String) -> void:
 	for filtered_event in filtered_events:
 		event_to_string.append(IconMap.get_filtered_name(filtered_event))
 
-	LocalSettings.change_setting(
-		"Keyboard Bindings (Player: %d)" % 0,
-		action_name,
-		event_to_string
-	)
+	if change_setting:
+		LocalSettings.change_setting(
+			"Bindings",
+			action_name,
+			event_to_string
+		)
 
 
 ## Adds the icon of the binding to the button.
@@ -125,7 +126,7 @@ func _add_icon(event: InputEvent) -> void:
 	icons.add_child(texture_rect)
 
 
-func _clear() -> void:
+func _clear(change_setting: bool = true) -> void:
 	bound_inputs.clear()
 	filtered_events.clear()
 
@@ -135,20 +136,18 @@ func _clear() -> void:
 	for bound_event in InputMap.action_get_events(action_name):
 		InputMap.action_erase_event(action_name, bound_event)
 
-	LocalSettings.change_setting(
-		"Keyboard Bindings (Player: %d)" % 0,
-		action_name,
-		PackedStringArray()
-	)
+	if change_setting:
+		LocalSettings.change_setting(
+			"Bindings",
+			action_name,
+			PackedStringArray()
+		)
 
 
 func _reset_to_default() -> void:
 	_clear()
 
-	for event in default_events:
-		if _is_valid_event(event):
-			_add_input(event, IconMap.get_filtered_name(event))
-			_add_icon(event)
+	LocalSettings.change_setting("Bindings", action_name, LocalSettings.defaults.get(action_name))
 
 
 func _reject() -> void:
@@ -171,6 +170,10 @@ func _return_to_idle():
 
 ## Checks if an event is parsable by using the defined classes in [member parsable_events].
 func _is_valid_event(event: InputEvent) -> bool:
+	# The event wasn't in the [IconMap].
+	if event == null:
+		return false
+
 	for event_type: InputEvent in parsable_events:
 		if event_type and event.is_class(event_type.get_class()):
 			return true

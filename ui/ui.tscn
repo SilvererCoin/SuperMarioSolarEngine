@@ -1,4 +1,4 @@
-[gd_scene load_steps=96 format=3 uid="uid://csf56lkxqqb12"]
+[gd_scene format=3 uid="uid://csf56lkxqqb12"]
 
 [ext_resource type="Script" uid="uid://brof7wb075ont" path="res://ui/ui.gd" id="1_75fsn"]
 [ext_resource type="AudioStream" uid="uid://b58aveo75onan" path="res://ui/sfx/pause.wav" id="2_1xskv"]
@@ -47,7 +47,6 @@
 [ext_resource type="Texture2D" uid="uid://bhvukbqm4v5f3" path="res://ui/input_icons/nintendo_switch/controller_switch_rumble.svg" id="49_lol4u"]
 [ext_resource type="PackedScene" uid="uid://q67oo8p20ee4" path="res://ui/screen_manager/options_screen/bind_setting.tscn" id="49_svocp"]
 [ext_resource type="Theme" uid="uid://blj83dty2taxs" path="res://ui/buttons/scrollbar.tres" id="50_5i7o0"]
-[ext_resource type="Script" uid="uid://d18f84ruj5057" path="res://ui/screen_manager/settings_screen/audio/audio_device_selector.gd" id="51_oqi1b"]
 [ext_resource type="PackedScene" uid="uid://b08q042unmcxf" path="res://ui/buttons/ui_selector.tscn" id="52_sk6td"]
 [ext_resource type="PackedScene" uid="uid://puhluie3m3cp" path="res://ui/screen_manager/options_screen/volume_setting.tscn" id="53_i1icy"]
 [ext_resource type="Texture2D" uid="uid://356g6gk2u4lq" path="res://ui/input_icons/nintendo_switch/switch_button_r.svg" id="54_lxqsa"]
@@ -457,6 +456,99 @@ border_blend = true
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_n7xk5"]
 content_margin_left = 3.0
 
+[sub_resource type="GDScript" id="GDScript_vgfim"]
+script/source = "extends UISelector
+
+signal audio_output_list_changed()
+
+@export var speaker_label: Label
+
+var audio_device_list: PackedStringArray
+
+
+func _ready() -> void:
+	super()
+
+	LocalSettings.setting_changed.connect(_setting_updated)
+	item_selected.connect(_on_item_selected)
+
+	audio_output_list_changed.connect(_update_list)
+	audio_device_list = AudioServer.get_output_device_list()
+
+	_update_speaker_label()
+	_update_list()
+
+	var saved_device: String = LocalSettings.load_setting(\"Audio\", \"device\")
+	AudioServer.output_device = saved_device
+
+	for device in audio_device_list:
+		if saved_device == device:
+			selected = get_item_index(audio_device_list.find(device))
+
+
+func _process(_delta: float) -> void:
+	var new_device_list: PackedStringArray = AudioServer.get_output_device_list()
+
+	if new_device_list != audio_device_list:
+		var selected_device: String = get_item_text(selected)
+
+		# If the selected audio device is removed, reset it to \"Default\"
+		if not selected_device in new_device_list:
+			push_warning(\"Selected device removed. Resetting to Default.\")
+			AudioServer.output_device = \"Default\"
+			selected = 0
+
+		audio_device_list = new_device_list
+		audio_output_list_changed.emit()
+
+
+func _update_speaker_label():
+	var speaker_mode_text: String
+	var speaker_mode = AudioServer.get_speaker_mode()
+
+	match speaker_mode:
+		AudioServer.SPEAKER_MODE_STEREO:
+			speaker_mode_text = \"Stereo\"
+		AudioServer.SPEAKER_SURROUND_31:
+			speaker_mode_text = \"Surround 3.1\"
+		AudioServer.SPEAKER_SURROUND_51:
+			speaker_mode_text = \"Surround 5.1\"
+		AudioServer.SPEAKER_SURROUND_71:
+			speaker_mode_text = \"Surround 7.1\"
+
+	speaker_label.text = \"Speaker Mode: %s\" % speaker_mode_text
+
+
+func _update_list():
+	var current_items: Dictionary[String, int] = {}
+	for item_number in range(item_count):
+		current_items[get_item_text(item_number)] = item_number
+
+	for device in audio_device_list:
+		if device not in current_items:
+			add_item(device)
+
+	for item in current_items.keys():
+		if item not in audio_device_list:
+			remove_item(current_items[item])
+
+
+func _on_item_selected(index):
+	var device_name: String = audio_device_list[index]
+
+	_update_speaker_label()
+
+	AudioServer.output_device = device_name
+
+	LocalSettings.change_setting(\"Audio\", \"device\", device_name)
+
+
+func _setting_updated(key: String, new_value: Variant = null):
+	if key != \"device\": return
+
+	selected = get_item_index(audio_device_list.find(new_value))
+"
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_n7xk5"]
 bg_color = Color(0.0528422, 0.0528421, 0.0528421, 0.8)
 corner_radius_top_right = 3
@@ -471,7 +563,7 @@ bg_color = Color(0, 0, 0, 1)
 
 [sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_r0xoq"]
 
-[node name="UI" type="CanvasLayer" node_paths=PackedStringArray("life_meter", "screen_manager", "color_blur", "zoom_blur_player", "notif_list", "debug", "debug_label", "input_display")]
+[node name="UI" type="CanvasLayer" unique_id=393817163 node_paths=PackedStringArray("life_meter", "screen_manager", "color_blur", "zoom_blur_player", "notif_list", "debug", "debug_label", "input_display")]
 process_mode = 3
 layer = 0
 script = ExtResource("1_75fsn")
@@ -487,11 +579,11 @@ debug = NodePath("Debug")
 debug_label = NodePath("Debug/DebugLabel")
 input_display = NodePath("Debug/InputDisplay")
 
-[node name="BackBufferFront" type="BackBufferCopy" parent="."]
+[node name="BackBufferFront" type="BackBufferCopy" parent="." unique_id=1979935432]
 copy_mode = 2
 metadata/_edit_lock_ = true
 
-[node name="CameraZoomMosaic" type="ColorRect" parent="."]
+[node name="CameraZoomMosaic" type="ColorRect" parent="." unique_id=1015062048]
 material = SubResource("ShaderMaterial_j6vdi")
 anchors_preset = 15
 anchor_right = 1.0
@@ -500,16 +592,14 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_lock_ = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="CameraZoomMosaic"]
-libraries = {
-&"": SubResource("AnimationLibrary_01nno")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="CameraZoomMosaic" unique_id=307473465]
+libraries/ = SubResource("AnimationLibrary_01nno")
 
-[node name="QualityToggle" parent="CameraZoomMosaic" instance=ExtResource("6_q1vx3")]
+[node name="QualityToggle" parent="CameraZoomMosaic" unique_id=590450661 instance=ExtResource("6_q1vx3")]
 
-[node name="CoinCounter" parent="." groups=["HUD"] instance=ExtResource("6_6apma")]
+[node name="CoinCounter" parent="." unique_id=1409061938 groups=["HUD"] instance=ExtResource("6_6apma")]
 
-[node name="RedCoinCounter" parent="." groups=["HUD"] instance=ExtResource("6_6apma")]
+[node name="RedCoinCounter" parent="." unique_id=179507644 groups=["HUD"] instance=ExtResource("6_6apma")]
 anchors_preset = -1
 offset_top = 37.0
 offset_bottom = 66.0
@@ -524,7 +614,7 @@ texture = SubResource("GradientTexture2D_m3cpd")
 modulate = Color(1, 0.98678994, 0.98678994, 1)
 text = "0/0"
 
-[node name="MusicLabel" type="Label" parent="." node_paths=PackedStringArray("anime")]
+[node name="MusicLabel" type="Label" parent="." unique_id=1477756910 node_paths=PackedStringArray("anime")]
 modulate = Color(1, 1, 1, 0)
 offset_top = 80.0
 offset_right = 259.0
@@ -534,17 +624,15 @@ label_settings = SubResource("LabelSettings_vqsyl")
 script = ExtResource("9_gbf2f")
 anime = NodePath("AnimationPlayer")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="MusicLabel"]
-libraries = {
-&"": SubResource("AnimationLibrary_504o4")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MusicLabel" unique_id=145971615]
+libraries/ = SubResource("AnimationLibrary_504o4")
 speed_scale = 1.5
 
-[node name="LifeMeter" parent="." groups=["HUD"] instance=ExtResource("7_m3cpd")]
+[node name="LifeMeter" parent="." unique_id=174602201 groups=["HUD"] instance=ExtResource("7_m3cpd")]
 
-[node name="FluddTank" parent="." groups=["HUD"] instance=ExtResource("8_n7xk5")]
+[node name="FluddTank" parent="." unique_id=756701723 groups=["HUD"] instance=ExtResource("8_n7xk5")]
 
-[node name="Debug" type="Control" parent="."]
+[node name="Debug" type="Control" parent="." unique_id=1835258959]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -552,7 +640,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="DebugLabel" type="Label" parent="Debug"]
+[node name="DebugLabel" type="Label" parent="Debug" unique_id=1988126284]
 layout_mode = 0
 offset_right = 134.0
 offset_bottom = 218.0
@@ -573,7 +661,7 @@ text = "		FPS = %s \\n
 label_settings = SubResource("LabelSettings_pm0uo")
 script = ExtResource("8_2m7jo")
 
-[node name="InputDisplay" type="HBoxContainer" parent="Debug"]
+[node name="InputDisplay" type="HBoxContainer" parent="Debug" unique_id=1768160601]
 custom_minimum_size = Vector2(0, 30)
 layout_mode = 1
 anchors_preset = 2
@@ -583,7 +671,7 @@ offset_top = -30.0
 grow_vertical = 0
 theme_override_constants/separation = 8
 
-[node name="ScreenManager" type="Control" parent="." node_paths=PackedStringArray("color_blur", "anime_player")]
+[node name="ScreenManager" type="Control" parent="." unique_id=1634294683 node_paths=PackedStringArray("color_blur", "anime_player")]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -602,17 +690,15 @@ screens = Dictionary[StringName, NodePath]({
 })
 metadata/_edit_lock_ = true
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="ScreenManager"]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="ScreenManager" unique_id=910465069]
 root_node = NodePath("../..")
-libraries = {
-&"": SubResource("AnimationLibrary_fpb10")
-}
+libraries/ = SubResource("AnimationLibrary_fpb10")
 
-[node name="BackBufferBack" type="BackBufferCopy" parent="ScreenManager"]
+[node name="BackBufferBack" type="BackBufferCopy" parent="ScreenManager" unique_id=1850662597]
 copy_mode = 2
 metadata/_edit_lock_ = true
 
-[node name="ColorBlurEffect" type="ColorRect" parent="ScreenManager"]
+[node name="ColorBlurEffect" type="ColorRect" parent="ScreenManager" unique_id=717384485]
 visible = false
 material = SubResource("ShaderMaterial_8xxao")
 layout_mode = 1
@@ -623,7 +709,7 @@ grow_horizontal = 2
 grow_vertical = 2
 metadata/_edit_lock_ = true
 
-[node name="PauseScreen" type="HBoxContainer" parent="ScreenManager" node_paths=PackedStringArray("retry", "reset", "focus_grabber")]
+[node name="PauseScreen" type="HBoxContainer" parent="ScreenManager" unique_id=36372901 node_paths=PackedStringArray("retry", "reset", "focus_grabber")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -639,7 +725,7 @@ open_anim = &"pause_peek"
 close_anim = &"BACKWARDS"
 focus_grabber = NodePath("LeftPanel/Content/MainButtons/Buttons/Resume")
 
-[node name="LeftPanel" type="TextureRect" parent="ScreenManager/PauseScreen"]
+[node name="LeftPanel" type="TextureRect" parent="ScreenManager/PauseScreen" unique_id=614241888]
 material = SubResource("ShaderMaterial_awrho")
 layout_mode = 2
 size_flags_horizontal = 3
@@ -648,7 +734,7 @@ texture = ExtResource("24_3rbo7")
 stretch_mode = 1
 flip_h = true
 
-[node name="Content" type="VBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel"]
+[node name="Content" type="VBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel" unique_id=396736750]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -661,7 +747,7 @@ grow_vertical = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 13
 
-[node name="Paused" type="Label" parent="ScreenManager/PauseScreen/LeftPanel/Content"]
+[node name="Paused" type="Label" parent="ScreenManager/PauseScreen/LeftPanel/Content" unique_id=387820568]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.6
@@ -670,120 +756,120 @@ label_settings = SubResource("LabelSettings_20l3y")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="MainButtons" type="HBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content"]
+[node name="MainButtons" type="HBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content" unique_id=1531912832]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="SpaceLeft" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons"]
+[node name="SpaceLeft" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons" unique_id=1857225873]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="Buttons" type="VBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons"]
+[node name="Buttons" type="VBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons" unique_id=115254720]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 20
 
-[node name="Resume" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons" instance=ExtResource("25_dlkvg")]
+[node name="Resume" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons" unique_id=245643511 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 theme_override_font_sizes/font_size = 27
 text = "RESUME"
 icon = ExtResource("26_ky4o2")
 press_sfx = ExtResource("27_fmjlm")
 
-[node name="LevelStateChoices" type="VBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons"]
+[node name="LevelStateChoices" type="VBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons" unique_id=59522378]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.8
 theme_override_constants/separation = 13
 
-[node name="Retry" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons/LevelStateChoices" instance=ExtResource("25_dlkvg")]
+[node name="Retry" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons/LevelStateChoices" unique_id=273295125 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 size_flags_stretch_ratio = 1.0
 text = "RETRY"
 icon = ExtResource("28_if46j")
 
-[node name="Reset" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons/LevelStateChoices" instance=ExtResource("25_dlkvg")]
+[node name="Reset" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons/LevelStateChoices" unique_id=509206397 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 size_flags_stretch_ratio = 1.0
 text = "RESET"
 icon = ExtResource("29_51b3m")
 
-[node name="SpaceRight" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons"]
+[node name="SpaceRight" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons" unique_id=771942424]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="Space" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content"]
+[node name="Space" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content" unique_id=2100497991]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="BottomButtons" type="HBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content"]
+[node name="BottomButtons" type="HBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content" unique_id=53483820]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.27
 theme_override_constants/separation = 13
 
-[node name="SpaceLeft" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons"]
+[node name="SpaceLeft" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" unique_id=512653263]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
 
-[node name="ActionGuide" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" instance=ExtResource("25_dlkvg")]
+[node name="ActionGuide" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" unique_id=1929345084 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 size_flags_stretch_ratio = 1.0
 text = ""
 icon = ExtResource("30_pgukk")
 icon_alignment = 1
 
-[node name="Options" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" instance=ExtResource("25_dlkvg")]
+[node name="Options" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" unique_id=1302318553 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 size_flags_stretch_ratio = 1.0
 text = ""
 icon = ExtResource("31_k6s1b")
 icon_alignment = 1
 
-[node name="Quit" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" instance=ExtResource("25_dlkvg")]
+[node name="Quit" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" unique_id=913658792 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 size_flags_stretch_ratio = 1.0
 text = ""
 icon = ExtResource("32_hgt1t")
 icon_alignment = 1
 
-[node name="SpaceRight" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons"]
+[node name="SpaceRight" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content/BottomButtons" unique_id=1010383193]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.3
 
-[node name="Space2" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content"]
+[node name="Space2" type="Control" parent="ScreenManager/PauseScreen/LeftPanel/Content" unique_id=1730523820]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.05
 
-[node name="GlobalCoins" type="HBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content"]
+[node name="GlobalCoins" type="HBoxContainer" parent="ScreenManager/PauseScreen/LeftPanel/Content" unique_id=965324965]
 layout_mode = 2
 alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="ScreenManager/PauseScreen/LeftPanel/Content/GlobalCoins"]
+[node name="TextureRect" type="TextureRect" parent="ScreenManager/PauseScreen/LeftPanel/Content/GlobalCoins" unique_id=1078607864]
 layout_mode = 2
 texture = ExtResource("33_f4mau")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="ScreenManager/PauseScreen/LeftPanel/Content/GlobalCoins"]
+[node name="Label" type="Label" parent="ScreenManager/PauseScreen/LeftPanel/Content/GlobalCoins" unique_id=2031319629]
 layout_mode = 2
 text = "x 0.000.000"
 label_settings = SubResource("LabelSettings_05wpc")
 horizontal_alignment = 2
 
-[node name="Info" type="Control" parent="ScreenManager/PauseScreen"]
+[node name="Info" type="Control" parent="ScreenManager/PauseScreen" unique_id=1333949420]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.5
 
-[node name="Contents" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info"]
+[node name="Contents" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info" unique_id=531846002]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -797,11 +883,11 @@ grow_vertical = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 1.3
 
-[node name="ShineInfo" type="Control" parent="ScreenManager/PauseScreen/Info/Contents"]
+[node name="ShineInfo" type="Control" parent="ScreenManager/PauseScreen/Info/Contents" unique_id=396497174]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="VBoxContainer" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo"]
+[node name="VBoxContainer" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo" unique_id=452191231]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -809,12 +895,12 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="InfoPanel" type="Panel" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer"]
+[node name="InfoPanel" type="Panel" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer" unique_id=720815084]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_52uul")
 
-[node name="TextContainer" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel"]
+[node name="TextContainer" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel" unique_id=378452544]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -826,33 +912,33 @@ offset_bottom = -5.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="LevelInfo" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer" node_paths=PackedStringArray("level_name", "mission_name", "mission_info")]
+[node name="LevelInfo" type="VBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer" unique_id=324846530 node_paths=PackedStringArray("level_name", "mission_name", "mission_info")]
 layout_mode = 2
 script = ExtResource("35_knc46")
 level_name = NodePath("LevelName")
 mission_name = NodePath("MissionSelector/MissionName")
 mission_info = NodePath("../MissionInfo")
 
-[node name="LevelName" type="Label" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo"]
+[node name="LevelName" type="Label" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo" unique_id=705250168]
 layout_mode = 2
 text = "Super Mario Solar Engine"
 label_settings = SubResource("LabelSettings_b067h")
 horizontal_alignment = 1
 clip_text = true
 
-[node name="Seperator" type="ColorRect" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo"]
+[node name="Seperator" type="ColorRect" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo" unique_id=1968326827]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 
-[node name="MissionSelector" type="HBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo"]
+[node name="MissionSelector" type="HBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo" unique_id=952716938]
 layout_mode = 2
 
-[node name="MissionPrev" type="Panel" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo/MissionSelector"]
+[node name="MissionPrev" type="Panel" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo/MissionSelector" unique_id=745197743]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_vopc7")
 
-[node name="MissionName" type="Label" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo/MissionSelector"]
+[node name="MissionName" type="Label" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo/MissionSelector" unique_id=462079264]
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -864,16 +950,16 @@ autowrap_mode = 3
 clip_text = true
 uppercase = true
 
-[node name="MissionNext" type="Panel" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo/MissionSelector"]
+[node name="MissionNext" type="Panel" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer/LevelInfo/MissionSelector" unique_id=446672733]
 custom_minimum_size = Vector2(16, 16)
 layout_mode = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_l1ahm")
 
-[node name="Seperator" type="ColorRect" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer"]
+[node name="Seperator" type="ColorRect" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer" unique_id=461891809]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 
-[node name="MissionInfo" type="Label" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer"]
+[node name="MissionInfo" type="Label" parent="ScreenManager/PauseScreen/Info/Contents/ShineInfo/VBoxContainer/InfoPanel/TextContainer" unique_id=787066962]
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 size_flags_vertical = 3
@@ -887,24 +973,24 @@ autowrap_mode = 3
 clip_text = true
 text_overrun_behavior = 4
 
-[node name="ViewSpace" type="Control" parent="ScreenManager/PauseScreen/Info/Contents"]
+[node name="ViewSpace" type="Control" parent="ScreenManager/PauseScreen/Info/Contents" unique_id=707206037]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
 
-[node name="AvailableFludds" type="HBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents"]
+[node name="AvailableFludds" type="HBoxContainer" parent="ScreenManager/PauseScreen/Info/Contents" unique_id=661958245]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.3
 alignment = 1
 
-[node name="SpaceLeft" type="Control" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds"]
+[node name="SpaceLeft" type="Control" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds" unique_id=1852152965]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.8
 
-[node name="Hover" type="TextureRect" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds"]
+[node name="Hover" type="TextureRect" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds" unique_id=1361988444]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -912,7 +998,7 @@ texture = ExtResource("37_08cx6")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Rocket" type="TextureRect" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds"]
+[node name="Rocket" type="TextureRect" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds" unique_id=710777130]
 modulate = Color(0, 0, 0, 1)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -921,7 +1007,7 @@ texture = ExtResource("38_sw3u4")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Turbo" type="TextureRect" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds"]
+[node name="Turbo" type="TextureRect" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds" unique_id=2011804045]
 modulate = Color(0, 0, 0, 1)
 layout_mode = 2
 size_flags_horizontal = 3
@@ -931,12 +1017,12 @@ texture = ExtResource("39_8iv75")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="SpaceRight" type="Control" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds"]
+[node name="SpaceRight" type="Control" parent="ScreenManager/PauseScreen/Info/Contents/AvailableFludds" unique_id=1451709537]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.8
 
-[node name="WarningScreen" type="TextureRect" parent="ScreenManager" node_paths=PackedStringArray("warning_text", "focus_grabber")]
+[node name="WarningScreen" type="TextureRect" parent="ScreenManager" unique_id=762927599 node_paths=PackedStringArray("warning_text", "focus_grabber")]
 visible = false
 z_index = 3
 material = SubResource("ShaderMaterial_scrfv")
@@ -960,7 +1046,7 @@ open_anim = &"warning_peek"
 close_anim = &"BACKWARDS"
 focus_grabber = NodePath("Spacing/Main/Buttons/Cancel")
 
-[node name="Spacing" type="HBoxContainer" parent="ScreenManager/WarningScreen"]
+[node name="Spacing" type="HBoxContainer" parent="ScreenManager/WarningScreen" unique_id=31044262]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -968,20 +1054,20 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="SpaceLeft" type="Control" parent="ScreenManager/WarningScreen/Spacing"]
+[node name="SpaceLeft" type="Control" parent="ScreenManager/WarningScreen/Spacing" unique_id=713548364]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.2
 
-[node name="Main" type="VBoxContainer" parent="ScreenManager/WarningScreen/Spacing"]
+[node name="Main" type="VBoxContainer" parent="ScreenManager/WarningScreen/Spacing" unique_id=760688868]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SpaceTop" type="Control" parent="ScreenManager/WarningScreen/Spacing/Main"]
+[node name="SpaceTop" type="Control" parent="ScreenManager/WarningScreen/Spacing/Main" unique_id=751160419]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="WarningText" type="RichTextLabel" parent="ScreenManager/WarningScreen/Spacing/Main"]
+[node name="WarningText" type="RichTextLabel" parent="ScreenManager/WarningScreen/Spacing/Main" unique_id=1163614215]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_fonts/normal_font = ExtResource("34_jyo83")
@@ -992,33 +1078,33 @@ Isn't it lovely?
 "
 scroll_active = false
 
-[node name="SpaceMiddle" type="Control" parent="ScreenManager/WarningScreen/Spacing/Main"]
+[node name="SpaceMiddle" type="Control" parent="ScreenManager/WarningScreen/Spacing/Main" unique_id=679480410]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Buttons" type="HBoxContainer" parent="ScreenManager/WarningScreen/Spacing/Main"]
+[node name="Buttons" type="HBoxContainer" parent="ScreenManager/WarningScreen/Spacing/Main" unique_id=542979680]
 layout_mode = 2
 theme_override_constants/separation = 60
 
-[node name="Cancel" parent="ScreenManager/WarningScreen/Spacing/Main/Buttons" instance=ExtResource("25_dlkvg")]
+[node name="Cancel" parent="ScreenManager/WarningScreen/Spacing/Main/Buttons" unique_id=344001515 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "CANCEL"
 
-[node name="Confirm" parent="ScreenManager/WarningScreen/Spacing/Main/Buttons" instance=ExtResource("25_dlkvg")]
+[node name="Confirm" parent="ScreenManager/WarningScreen/Spacing/Main/Buttons" unique_id=1919580498 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "CONFIRM"
 
-[node name="SpaceBottom" type="Control" parent="ScreenManager/WarningScreen/Spacing/Main"]
+[node name="SpaceBottom" type="Control" parent="ScreenManager/WarningScreen/Spacing/Main" unique_id=2031953459]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.5
 
-[node name="SpaceRight" type="Control" parent="ScreenManager/WarningScreen/Spacing"]
+[node name="SpaceRight" type="Control" parent="ScreenManager/WarningScreen/Spacing" unique_id=1734752078]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.2
 
-[node name="OptionsScreen" type="VBoxContainer" parent="ScreenManager" node_paths=PackedStringArray("focus_grabber")]
+[node name="OptionsScreen" type="VBoxContainer" parent="ScreenManager" unique_id=1039564080 node_paths=PackedStringArray("focus_grabber")]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -1036,13 +1122,13 @@ open_anim = &"options_peek"
 close_anim = &"BACKWARDS"
 focus_grabber = NodePath("TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync/ToggleButton")
 
-[node name="Header" type="Panel" parent="ScreenManager/OptionsScreen"]
+[node name="Header" type="Panel" parent="ScreenManager/OptionsScreen" unique_id=1231787544]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.14
 theme_override_styles/panel = SubResource("StyleBoxFlat_ev48a")
 
-[node name="Label" type="Label" parent="ScreenManager/OptionsScreen/Header"]
+[node name="Label" type="Label" parent="ScreenManager/OptionsScreen/Header" unique_id=1567480581]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -1054,7 +1140,7 @@ label_settings = SubResource("LabelSettings_46i77")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="TextureRect" type="TextureRect" parent="ScreenManager/OptionsScreen"]
+[node name="TextureRect" type="TextureRect" parent="ScreenManager/OptionsScreen" unique_id=1422089629]
 material = SubResource("ShaderMaterial_avox5")
 layout_mode = 2
 size_flags_vertical = 3
@@ -1062,7 +1148,7 @@ texture = SubResource("CompressedTexture2D_nte8f")
 stretch_mode = 1
 flip_h = true
 
-[node name="Content" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect"]
+[node name="Content" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect" unique_id=355959904]
 z_index = 1
 layout_mode = 1
 anchors_preset = -1
@@ -1073,12 +1159,12 @@ offset_right = -50.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="TabControls" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content"]
+[node name="TabControls" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content" unique_id=2112826452]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Left" type="Button" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls"]
+[node name="Left" type="Button" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls" unique_id=212968999]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.06
@@ -1091,7 +1177,7 @@ icon_alignment = 2
 vertical_icon_alignment = 0
 expand_icon = true
 
-[node name="Tabs" type="TabContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls"]
+[node name="Tabs" type="TabContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls" unique_id=1512779639]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -1101,249 +1187,235 @@ theme_override_font_sizes/font_size = 16
 theme_override_styles/panel = SubResource("StyleBoxEmpty_q1vx3")
 theme_override_styles/tab_selected = SubResource("StyleBoxFlat_m3cpd")
 tab_alignment = 1
-current_tab = 0
+current_tab = 1
 tab_focus_mode = 0
 
-[node name="General" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" node_paths=PackedStringArray("fps_cap_button")]
+[node name="General" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" unique_id=1400883172 node_paths=PackedStringArray("fps_cap_button")]
+visible = false
 layout_mode = 2
 script = ExtResource("47_mvot7")
 fps_cap_button = NodePath("ScrollContainer/Content/TopButtons/FPS/SelectorButton")
 metadata/_tab_index = 0
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General" unique_id=1897692378]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General" unique_id=647844723]
 clip_contents = false
 custom_minimum_size = Vector2(1, 1)
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Content" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer"]
+[node name="Content" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer" unique_id=1762748079]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="TopButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content"]
+[node name="TopButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content" unique_id=1884362566]
 layout_mode = 2
 theme_override_constants/separation = 32
 
-[node name="VSync" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons"]
+[node name="VSync" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons" unique_id=1032432614]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync" unique_id=1515659694]
 layout_mode = 2
 text = "V Sync"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync" unique_id=2071080012]
 layout_mode = 2
 
-[node name="ToggleButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync" instance=ExtResource("25_dlkvg")]
+[node name="ToggleButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/VSync" unique_id=1503948673 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "OFF"
 script = ExtResource("47_t7euy")
-default_value = false
-setting_section = "General"
-setting_key = "v_sync"
+setting = "v_sync"
 
-[node name="FPS" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons"]
+[node name="FPS" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons" unique_id=2093886096]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/FPS"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/FPS" unique_id=1890463754]
 layout_mode = 2
 text = "FPS Cap"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/FPS"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/FPS" unique_id=978777899]
 layout_mode = 2
 
-[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/FPS" instance=ExtResource("25_dlkvg")]
+[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/FPS" unique_id=1500226259 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "60 FPS"
 script = ExtResource("45_23m8v")
 options = Array[StringName]([&"OFF", &"30 FPS", &"60 FPS", &"120 FPS"])
-default_value = 2
-setting_section = "General"
-setting_key = "fps_cap"
+setting = "fps_cap"
 
-[node name="Quality" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons"]
+[node name="Quality" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons" unique_id=236672133]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/Quality"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/Quality" unique_id=1190062268]
 layout_mode = 2
 text = "Visual Quality"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/Quality"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/Quality" unique_id=410724891]
 layout_mode = 2
 
-[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/Quality" instance=ExtResource("25_dlkvg")]
+[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/TopButtons/Quality" unique_id=2136263229 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "HIGH"
 script = ExtResource("45_23m8v")
 options = Array[StringName]([&"HIGH", &"LOW", &"MEDIUM"])
-default_value = 0
-setting_section = "General"
-setting_key = "quality"
+setting = "quality"
 
-[node name="MiddleButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content"]
+[node name="MiddleButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content" unique_id=871884779]
 layout_mode = 2
 theme_override_constants/separation = 32
 
-[node name="Discord" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons"]
+[node name="Discord" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons" unique_id=623545587]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord"]
+[node name="Header" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord" unique_id=2032370803]
 layout_mode = 2
 theme_override_constants/separation = 7
 alignment = 1
 
-[node name="Icon" type="TextureRect" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord/Header"]
+[node name="Icon" type="TextureRect" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord/Header" unique_id=833976351]
 layout_mode = 2
 texture = ExtResource("46_afcad")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord/Header"]
+[node name="Text" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord/Header" unique_id=1407162431]
 layout_mode = 2
 text = "Rich Presence"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord" unique_id=1412029436]
 layout_mode = 2
 
-[node name="ToggleButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord" instance=ExtResource("25_dlkvg")]
+[node name="ToggleButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Discord" unique_id=341642400 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "ON"
 script = ExtResource("47_t7euy")
-default_value = true
-setting_section = "General"
-setting_key = "rich_presence"
+setting = "rich_presence"
 
-[node name="Window" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons"]
+[node name="Window" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons" unique_id=1169009786]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Window"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Window" unique_id=1535758116]
 layout_mode = 2
 text = "Window Scale"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Window"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Window" unique_id=1355921674]
 layout_mode = 2
 
-[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Window" instance=ExtResource("25_dlkvg")]
+[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/MiddleButtons/Window" unique_id=291050295 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "x1 SCALE"
 script = ExtResource("45_23m8v")
 options = Array[StringName]([&"x1 SCALE", &"x2 SCALE", &"x3 SCALE", &"FULLSCREEN"])
-default_value = 3
-setting_section = "General"
-setting_key = "scale"
+setting = "scale"
 
-[node name="BottomButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content"]
+[node name="BottomButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content" unique_id=431223058]
 layout_mode = 2
 theme_override_constants/separation = 32
 
-[node name="MotionToggle" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons"]
+[node name="MotionToggle" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons" unique_id=124868263]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle"]
+[node name="Header" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle" unique_id=829070946]
 layout_mode = 2
 theme_override_constants/separation = 7
 alignment = 1
 
-[node name="Icon" type="TextureRect" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle/Header"]
+[node name="Icon" type="TextureRect" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle/Header" unique_id=1423701488]
 layout_mode = 2
 texture = ExtResource("48_1v6c2")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle/Header"]
+[node name="Text" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle/Header" unique_id=1833746507]
 layout_mode = 2
 text = "Motion Controls"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle" unique_id=1892546863]
 layout_mode = 2
 
-[node name="ToggleButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle" instance=ExtResource("25_dlkvg")]
+[node name="ToggleButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/MotionToggle" unique_id=759915542 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "OFF"
 script = ExtResource("47_t7euy")
-default_value = true
-setting_section = "General"
-setting_key = "motion_controls"
+setting = "motion_controls"
 
-[node name="RumbleStrength" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons"]
+[node name="RumbleStrength" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons" unique_id=1854420787]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength"]
+[node name="Header" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength" unique_id=617540169]
 layout_mode = 2
 theme_override_constants/separation = 7
 alignment = 1
 
-[node name="Icon" type="TextureRect" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength/Header"]
+[node name="Icon" type="TextureRect" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength/Header" unique_id=1841832377]
 layout_mode = 2
 texture = ExtResource("49_lol4u")
 expand_mode = 3
 stretch_mode = 5
 
-[node name="Text" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength/Header"]
+[node name="Text" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength/Header" unique_id=124704267]
 layout_mode = 2
 text = "Rumble Strength"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength" unique_id=1448761467]
 layout_mode = 2
 
-[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength" instance=ExtResource("25_dlkvg")]
+[node name="SelectorButton" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/General/ScrollContainer/Content/BottomButtons/RumbleStrength" unique_id=1773441411 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "HIGH"
 script = ExtResource("45_23m8v")
 options = Array[StringName]([&"OFF", &"LOW", &"MEDIUM", &"HIGH"])
-default_value = 2
-setting_section = "General"
-setting_key = "rumble_strength"
+setting = "rumble_strength"
 
-[node name="Controls" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs"]
-visible = false
+[node name="Controls" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" unique_id=1709646911]
 layout_mode = 2
 theme_override_constants/separation = 16
 metadata/_tab_index = 1
 
-[node name="Control" type="Panel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls"]
+[node name="Control" type="Panel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls" unique_id=1255462569]
 clip_children = 1
 clip_contents = true
 layout_mode = 2
@@ -1351,7 +1423,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_mvot7")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control" unique_id=205027965]
 z_index = 1
 clip_contents = false
 custom_minimum_size = Vector2(1, 1)
@@ -1365,37 +1437,36 @@ size_flags_vertical = 3
 theme = ExtResource("50_5i7o0")
 theme_override_styles/panel = SubResource("StyleBoxEmpty_n7xk5")
 follow_focus = true
-scroll_vertical = 100
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer" unique_id=2064359824]
 z_index = -1
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Actions" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer"]
+[node name="Actions" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer" unique_id=184316159]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 17
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=645589936]
 custom_minimum_size = Vector2(0, 10)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Input" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions"]
+[node name="Input" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=167976418]
 layout_mode = 2
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions/Input"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions/Input" unique_id=58040520]
 layout_mode = 2
 text = "Input Mode: "
 label_settings = SubResource("LabelSettings_xphw0")
 vertical_alignment = 1
 
-[node name="PresetSelector2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions/Input" instance=ExtResource("52_sk6td")]
+[node name="PresetSelector2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions/Input" unique_id=1085095838 instance=ExtResource("52_sk6td")]
 custom_minimum_size = Vector2(0, 27)
 layout_mode = 2
 selected = 0
@@ -1403,28 +1474,28 @@ item_count = 1
 popup/item_0/text = "KEYBOARD + MOUSE"
 popup/item_0/id = 0
 
-[node name="Space3" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions"]
+[node name="Space3" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=403984716]
 custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="BindSetting" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=754586437 instance=ExtResource("49_svocp")]
 layout_mode = 2
 
-[node name="BindSetting2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=754599030 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"left"
 vis_title = &"Move Left"
 vis_icon_flip_h = true
 
-[node name="BindSetting3" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting3" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=2071984428 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"up"
 vis_title = &"Move Up"
 vis_animation = &"swim"
 
-[node name="BindSetting4" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting4" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=1447932515 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"down"
 vis_title = &"Move Down"
@@ -1432,52 +1503,52 @@ vis_animation = &"swim"
 vis_icon_flip_h = true
 vis_icon_flip_v = true
 
-[node name="BindSetting5" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting5" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=1864629858 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"jump"
 vis_title = &"Jump"
 vis_animation = &"jump"
 
-[node name="BindSetting6" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting6" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=1750075054 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"spin"
 vis_title = &"Spin"
 vis_animation = &"spin_attack"
 
-[node name="BindSetting7" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting7" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=1282184756 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"dive"
 vis_title = &"Dive"
 vis_animation = &"dive"
 
-[node name="BindSetting8" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" instance=ExtResource("49_svocp")]
+[node name="BindSetting8" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=881960758 instance=ExtResource("49_svocp")]
 layout_mode = 2
 p_action_name = &"groundpound"
 vis_title = &"Ground-Pound"
 vis_animation = &"gp"
 
-[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions"]
+[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer/Actions" unique_id=1769740541]
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls/Control/ScrollContainer/HBoxContainer" unique_id=698466511]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.03
 
-[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls"]
+[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Controls" unique_id=1301529973]
 custom_minimum_size = Vector2(0, 12)
 layout_mode = 2
 size_flags_stretch_ratio = 0.1
 
-[node name="Sound" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs"]
+[node name="Sound" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" unique_id=2093018172]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 2
 
-[node name="Control" type="Panel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound"]
+[node name="Control" type="Panel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound" unique_id=451832648]
 clip_children = 1
 clip_contents = true
 layout_mode = 2
@@ -1485,7 +1556,7 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_mvot7")
 
-[node name="ScrollContainer" type="ScrollContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control"]
+[node name="ScrollContainer" type="ScrollContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control" unique_id=1730002083]
 z_index = 1
 clip_contents = false
 custom_minimum_size = Vector2(1, 1)
@@ -1502,139 +1573,139 @@ follow_focus = true
 horizontal_scroll_mode = 0
 vertical_scroll_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer" unique_id=722725613]
 z_index = -1
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Content" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer"]
+[node name="Content" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer" unique_id=1405240327]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=1400789438]
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="AudioDevice" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content"]
+[node name="AudioDevice" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=1690681885]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice" unique_id=1216870003]
 layout_mode = 2
 text = "Audio Device"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice" unique_id=987160702]
 layout_mode = 2
 
-[node name="PresetSelector" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice" node_paths=PackedStringArray("speaker_label") instance=ExtResource("52_sk6td")]
+[node name="PresetSelector" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice" unique_id=1652699040 node_paths=PackedStringArray("speaker_label") instance=ExtResource("52_sk6td")]
 custom_minimum_size = Vector2(0, 27)
 layout_mode = 2
-script = ExtResource("51_oqi1b")
+script = SubResource("GDScript_vgfim")
 speaker_label = NodePath("../SpeakerMode")
 
-[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice"]
+[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice" unique_id=323102323]
 custom_minimum_size = Vector2(0, 5)
 layout_mode = 2
 
-[node name="SpeakerMode" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice"]
+[node name="SpeakerMode" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content/AudioDevice" unique_id=1244611670]
 layout_mode = 2
 theme_override_fonts/font = ExtResource("34_jyo83")
 theme_override_font_sizes/font_size = 15
 text = "Speaker Mode:"
 horizontal_alignment = 1
 
-[node name="MasterVolume" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" instance=ExtResource("53_i1icy")]
+[node name="MasterVolume" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=1816654138 instance=ExtResource("53_i1icy")]
 layout_mode = 2
 
-[node name="MusicVolume2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" instance=ExtResource("53_i1icy")]
+[node name="MusicVolume2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=1140861298 instance=ExtResource("53_i1icy")]
 layout_mode = 2
 header_text = "Music Volume"
 bus_name = &"Music"
 
-[node name="SFXVolume" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" instance=ExtResource("53_i1icy")]
+[node name="SFXVolume" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=528485732 instance=ExtResource("53_i1icy")]
 layout_mode = 2
 header_text = "Sound Effects Volume"
 bus_name = &"SFX"
 
-[node name="VoiceVolume2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" instance=ExtResource("53_i1icy")]
+[node name="VoiceVolume2" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=613767193 instance=ExtResource("53_i1icy")]
 layout_mode = 2
 header_text = "Voices Volume"
 bus_name = &"Voice"
 
-[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content"]
+[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer/Content" unique_id=859588523]
 custom_minimum_size = Vector2(0, 3)
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound/Control/ScrollContainer/HBoxContainer" unique_id=837090760]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.03
 
-[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound"]
+[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Sound" unique_id=1821637957]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Accessibility" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs"]
+[node name="Accessibility" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" unique_id=462425151]
 visible = false
 layout_mode = 2
 metadata/_tab_index = 3
 
-[node name="Data" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" node_paths=PackedStringArray("data_label")]
+[node name="Data" type="VBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs" unique_id=844587460 node_paths=PackedStringArray("data_label")]
 visible = false
 layout_mode = 2
 script = ExtResource("57_y28h8")
 data_label = NodePath("Panel/RichTextLabel")
 metadata/_tab_index = 4
 
-[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="Space" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=190457657]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="TopButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="TopButtons" type="HBoxContainer" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=1089830758]
 layout_mode = 2
 theme_override_constants/separation = 32
 
-[node name="OpenData" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data/TopButtons" instance=ExtResource("25_dlkvg")]
+[node name="OpenData" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data/TopButtons" unique_id=2105952765 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "OPEN FOLDER"
 
-[node name="ResetData" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data/TopButtons" instance=ExtResource("25_dlkvg")]
+[node name="ResetData" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data/TopButtons" unique_id=2131401660 instance=ExtResource("25_dlkvg")]
 layout_mode = 2
 text = "RESET DATA"
 
-[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="Space2" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=1006247793]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="Header" type="Label" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=1446812441]
 layout_mode = 2
 text = "Data Peek:"
 label_settings = SubResource("LabelSettings_xphw0")
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Space4" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="Space4" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=1726466228]
 layout_mode = 2
 
-[node name="Panel" type="Panel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="Panel" type="Panel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=1269393658]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_n7xk5")
 
-[node name="RichTextLabel" type="RichTextLabel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data/Panel"]
+[node name="RichTextLabel" type="RichTextLabel" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data/Panel" unique_id=1758415192]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -1654,12 +1725,12 @@ text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod 
 context_menu_enabled = true
 selection_enabled = true
 
-[node name="Space3" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data"]
+[node name="Space3" type="Control" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls/Tabs/Data" unique_id=1730608117]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 
-[node name="Right" type="Button" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls"]
+[node name="Right" type="Button" parent="ScreenManager/OptionsScreen/TextureRect/Content/TabControls" unique_id=513512920]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 0.06
@@ -1671,13 +1742,13 @@ flat = true
 vertical_icon_alignment = 0
 expand_icon = true
 
-[node name="Footer" type="Panel" parent="ScreenManager/OptionsScreen"]
+[node name="Footer" type="Panel" parent="ScreenManager/OptionsScreen" unique_id=1990867750]
 layout_mode = 2
 size_flags_vertical = 3
 size_flags_stretch_ratio = 0.1
 theme_override_styles/panel = SubResource("StyleBoxFlat_gdkor")
 
-[node name="Content" type="HBoxContainer" parent="ScreenManager/OptionsScreen/Footer"]
+[node name="Content" type="HBoxContainer" parent="ScreenManager/OptionsScreen/Footer" unique_id=665913448]
 layout_mode = 1
 anchors_preset = -1
 anchor_right = 1.0
@@ -1689,7 +1760,7 @@ offset_bottom = -6.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Return" type="Button" parent="ScreenManager/OptionsScreen/Footer/Content"]
+[node name="Return" type="Button" parent="ScreenManager/OptionsScreen/Footer/Content" unique_id=586727316]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 focus_mode = 0
@@ -1701,7 +1772,7 @@ text = "Return"
 icon = ExtResource("55_qillv")
 expand_icon = true
 
-[node name="Select" type="Button" parent="ScreenManager/OptionsScreen/Footer/Content"]
+[node name="Select" type="Button" parent="ScreenManager/OptionsScreen/Footer/Content" unique_id=1681622438]
 custom_minimum_size = Vector2(80, 0)
 layout_mode = 2
 focus_mode = 0
@@ -1713,11 +1784,11 @@ text = "Select"
 icon = ExtResource("56_7h42w")
 expand_icon = true
 
-[node name="Control" type="Control" parent="ScreenManager/OptionsScreen/Footer/Content"]
+[node name="Control" type="Control" parent="ScreenManager/OptionsScreen/Footer/Content" unique_id=238163801]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Reset" type="Button" parent="ScreenManager/OptionsScreen/Footer/Content"]
+[node name="Reset" type="Button" parent="ScreenManager/OptionsScreen/Footer/Content" unique_id=2023880530]
 custom_minimum_size = Vector2(160, 0)
 layout_mode = 2
 focus_mode = 0
@@ -1729,7 +1800,7 @@ text = "Reset to Default"
 icon = ExtResource("57_h5v5y")
 expand_icon = true
 
-[node name="Notifications" type="Node" parent="."]
+[node name="Notifications" type="Node" parent="." unique_id=2060452021]
 
 [connection signal="pressed" from="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons/Resume" to="ScreenManager/PauseScreen" method="_on_resume_pressed"]
 [connection signal="pressed" from="ScreenManager/PauseScreen/LeftPanel/Content/MainButtons/Buttons/LevelStateChoices/Retry" to="ScreenManager/PauseScreen" method="_on_retry_pressed"]

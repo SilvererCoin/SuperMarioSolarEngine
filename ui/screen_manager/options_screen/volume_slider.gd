@@ -9,7 +9,7 @@ func _ready() -> void:
 	await owner.ready
 
 	if not Engine.is_editor_hint():
-		var saved_volume: float = LocalSettings.load_setting("Audio", bus.setting_name, default_value)
+		var saved_volume: float = LocalSettings.load_setting("Audio", bus.setting_name)
 		slider.value = saved_volume * 100
 
 		bus.bus_volume_updated.connect(_bus_updated)

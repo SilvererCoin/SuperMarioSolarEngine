@@ -1,3 +1,4 @@
+@tool
 class_name OptionEnum
 extends OptionBase
 ## UI button that can toggle between different defined states.

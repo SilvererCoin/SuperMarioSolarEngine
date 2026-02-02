@@ -13,3 +13,17 @@ static func set_cursor_to_default():
 		Input.CURSOR_ARROW,
 		ProjectSettings.get_setting("display/mouse_cursor/custom_image_hotspot")
 	)
+
+
+static func get_default_events(action: String, as_strings: bool = false) -> Array:
+	var action_path: String = "input/" + action
+	var action_data: Dictionary = ProjectSettings.get(action_path)
+
+	if not as_strings:
+		return action_data["events"]
+	else:
+		var names := PackedStringArray()
+		for event in action_data["events"]:
+			names.append(IconMap.get_filtered_name(event))
+
+		return names

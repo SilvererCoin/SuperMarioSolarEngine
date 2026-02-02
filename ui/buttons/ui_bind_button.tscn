@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://dd4exd7vseqoc"]
+[gd_scene format=3 uid="uid://dd4exd7vseqoc"]
 
 [ext_resource type="FontFile" uid="uid://e821cxxeybxh" path="res://ui/fonts/mario_sunshine.ttf" id="1_7gm1v"]
 [ext_resource type="StyleBox" uid="uid://5hmjrr5vg4hn" path="res://ui/buttons/button_pressed.tres" id="2_w5m5l"]
@@ -33,7 +33,7 @@ shader = ExtResource("8_if13h")
 shader_parameter/enabled = true
 shader_parameter/invert_absolute_colors = true
 
-[node name="BindButton" type="Button" node_paths=PackedStringArray("timer", "icons")]
+[node name="BindButton" type="Button" unique_id=610181930 node_paths=PackedStringArray("timer", "icons")]
 offset_right = 128.0
 offset_bottom = 31.0
 size_flags_horizontal = 3
@@ -66,7 +66,7 @@ icons = NodePath("IconContainer")
 press_sfx = ExtResource("5_bh05p")
 cursor_sfx = ExtResource("6_s3vyc")
 
-[node name="Dropshadow" type="Panel" parent="."]
+[node name="Dropshadow" type="Panel" parent="." unique_id=1127922736]
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 15
@@ -82,7 +82,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_2o8a4")
 
-[node name="Outerline" type="Panel" parent="Dropshadow"]
+[node name="Outerline" type="Panel" parent="Dropshadow" unique_id=965626398]
 show_behind_parent = true
 layout_mode = 1
 anchors_preset = 15
@@ -98,7 +98,7 @@ size_flags_vertical = 3
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_2ao57")
 
-[node name="IconContainer" type="HBoxContainer" parent="."]
+[node name="IconContainer" type="HBoxContainer" parent="." unique_id=545512760]
 clip_children = 2
 material = SubResource("ShaderMaterial_s3vyc")
 layout_mode = 1
@@ -111,7 +111,7 @@ grow_horizontal = 2
 grow_vertical = 2
 alignment = 1
 
-[node name="TimeoutTimer" type="Timer" parent="."]
+[node name="TimeoutTimer" type="Timer" parent="." unique_id=824849298]
 wait_time = 3.0
 one_shot = true
 ignore_time_scale = true

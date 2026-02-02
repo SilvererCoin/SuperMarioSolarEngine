@@ -20,7 +20,7 @@ func _init(new_bus_name: StringName, new_setting_name: String):
 	setting_name = new_setting_name
 	bus_name = new_bus_name
 
-	var saved_linear: float = LocalSettings.load_setting("Audio", setting_name, 1.0)
+	var saved_linear: float = LocalSettings.load_setting("Audio", setting_name)
 
 	bus_index = AudioServer.get_bus_index(bus_name)
 

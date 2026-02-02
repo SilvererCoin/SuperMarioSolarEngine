@@ -1,7 +1,7 @@
+@tool
 class_name OptionBool
 extends OptionBase
 ## UI button that can be turned on or off.
-
 
 const ON_TEXT: String = "ON"
 const OFF_TEXT: String = "OFF"

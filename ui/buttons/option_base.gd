@@ -1,35 +1,35 @@
+@tool
 @abstract
 class_name OptionBase
 extends UIButton
 
-## The value that gets loaded in by default if there is no saved setting.?
-@export var default_value: Variant
-
-## Which section this button's value gets saved to in [LocalSettings].
-@export var setting_section: String
-## Which key this button's value gets saved to in [LocalSettings].
-@export var setting_key: String
+var setting: String:
+	set(val):
+		var key := val.get_slice("/", 1)
+		setting = key
 
 ## Variant typed so extended classes can set their own type.
 var value: Variant = false
 
 
 func _ready():
+	if Engine.is_editor_hint():
+		return
+
 	super()
 
 	LocalSettings.connect(&"setting_changed", update_value)
 
-	# Initialise buttons and settings
+	# Initialise button
 	var saved_val: Variant = LocalSettings.load_setting(
-		setting_section, setting_key, default_value
+		LocalSettings.get_section(setting), setting
 	)
-	update_value(setting_key, saved_val)
-	GameState.setting_initialised.emit(setting_key, saved_val)
+	update_value(setting, saved_val)
 
 
 func update_value(key: String, new_value: Variant = null):
 	# If the entered key doesn't relate to the button running this code
-	if key != setting_key:
+	if key != setting:
 		return
 
 	value = new_value
@@ -38,10 +38,35 @@ func update_value(key: String, new_value: Variant = null):
 
 
 func change_setting(new_value):
-	if setting_section.is_empty() or setting_key.is_empty():
+	if setting.is_empty():
 		return
 
-	LocalSettings.change_setting(setting_section, setting_key, new_value)
+	LocalSettings.change_setting(
+		LocalSettings.get_section(setting),
+		setting,
+		new_value
+	)
+
+
+func _get_property_list() -> Array[Dictionary]:
+	if not Engine.is_editor_hint():
+		return []
+
+	var all_keys: PackedStringArray = []
+
+	for section in LocalSettings.settings:
+		for key in LocalSettings.settings[section]:
+			all_keys.append("%s/%s" % [section, key])
+
+	return [
+		{
+			"name": "setting",
+			"type": TYPE_STRING,
+			"hint": PROPERTY_HINT_ENUM,
+			"hint_string": ",".join(all_keys),
+			"usage": PROPERTY_USAGE_DEFAULT,
+		},
+	]
 
 
 ## Overwritten by the parent class.[br]

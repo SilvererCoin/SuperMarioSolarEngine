@@ -26,8 +26,11 @@ static func get_filtered_name(event: InputEvent) -> String:
 	elif event is InputEventMouseButton:
 		event_name = event.as_text().rsplit("+", true, 1)[-1].replace(" (Double Click)", "")
 	elif event is InputEventJoypadButton:
-		event_name = event.as_text()
+		event_name = _joypad_button_name(event.button_index)
+	elif event is InputEventJoypadMotion:
+		event_name = _joypad_motion_name(event.axis, event.axis_value)
 	else:
+		push_warning("Filtered names for actions of type %s are unsupported." % event.get_class())
 		event_name = ""  # Unknown or unsupported input type
 
 	return event_name
@@ -42,3 +45,60 @@ static func get_associated_event(filtered_name: String) -> InputEvent:
 static func find(event: InputEvent) -> CompressedTexture2D:
 	var key: String = get_filtered_name(event)
 	return icon_map.dictionary.get(event_map.get(key.hash()), null)
+
+
+static func _joypad_button_name(button: int) -> String:
+	match button:
+		# Nintendo defaults since this is a Mario engine.
+		JOY_BUTTON_A: return "B Button"
+		JOY_BUTTON_B: return "A Button"
+		JOY_BUTTON_X: return "Y Button"
+		JOY_BUTTON_Y: return "X Button"
+
+		JOY_BUTTON_LEFT_SHOULDER: return "Left Shoulder Button"
+		JOY_BUTTON_RIGHT_SHOULDER: return "Right Shoulder Button"
+
+		JOY_BUTTON_BACK: return "- Button"
+		JOY_BUTTON_START: return "+ Button"
+		JOY_BUTTON_GUIDE: return "Home Button"
+		JOY_BUTTON_MISC1: return "Capture Button"
+
+		JOY_BUTTON_LEFT_STICK: return "Left Stick"
+		JOY_BUTTON_RIGHT_STICK: return "Right Stick"
+
+		JOY_BUTTON_DPAD_UP: return "D-Pad Up"
+		JOY_BUTTON_DPAD_DOWN: return "D-Pad Down"
+		JOY_BUTTON_DPAD_LEFT: return "D-Pad Left"
+		JOY_BUTTON_DPAD_RIGHT: return "D-Pad Right"
+
+		_: return "Button %d" % button
+
+
+static func _joypad_motion_name(axis: int, value: float) -> String:
+	match axis:
+		JOY_AXIS_LEFT_X:
+			if value >= 0.0:
+				return "Left Stick - Right"
+			else:
+				return "Left Stick - Left"
+		JOY_AXIS_LEFT_Y:
+			if value >= 0.0:
+				return "Left Stick - Up"
+			else:
+				return "Left Stick - Down"
+		JOY_AXIS_RIGHT_X:
+			if value >= 0.0:
+				return "Right Stick - Right"
+			else:
+				return "Right Stick - Left"
+		JOY_AXIS_RIGHT_Y:
+			if value >= 0.0:
+				return "Right Stick - Up"
+			else:
+				return "Right Stick - Down"
+		JOY_AXIS_TRIGGER_LEFT:
+			return "Left Trigger"
+		JOY_AXIS_TRIGGER_RIGHT:
+			return "Right Trigger"
+
+		_: return "Axis %d%f" % [axis, value]

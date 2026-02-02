@@ -1,3 +1,4 @@
+@tool
 extends Node
 ## Settings stored on the user's system.
 
@@ -6,8 +7,79 @@ signal setting_changed(key, new_value)
 const FILE_PATH: String = "user://settings.cfg"
 var config := ConfigFile.new()
 
+# Dictionary of every setting that gets stored to the user's system.
+var settings: Dictionary[String, Variant] = {
+	"General":
+		[
+			"scale",
+			"v_sync",
+			"quality",
+			"rich_presence",
+			"motion_controls",
+			"rumble_strength",
+			"fps_cap",
+		],
+	"Audio":
+		[
+			"master_volume",
+			"bgm_volume",
+			"sfx_volume",
+			"voice_volume",
+			"music_muted",
+			"device",
+		],
+	"Developer":
+		[
+			"debug_toggle",
+			"debug_toggle_collision_shapes",
+		],
+	# TODO: replace % 0 with whatever system we decide to to for multiplayer
+	"Bindings":
+		[
+			"right",
+			"left",
+			"up",
+			"down",
+			"jump",
+			"spin",
+			"dive",
+			"groundpound",
+		]
+}
+
 # Dictionary of every key and its default value.
-var defaults: Dictionary[String, Variant] = {}
+var defaults: Dictionary[String, Variant] = {
+	# General
+	"scale": 1,
+	"v_sync": true,
+	"quality": GameState.Qualities.HIGH,
+	"rich_presence": true,
+	"motion_controls": false,
+	"rumble_strength": 2,
+	"fps_cap": 2,
+
+	# Audio
+	"master_volume": 1.0,
+	"bgm_volume": 1.0,
+	"sfx_volume": 1.0,
+	"voice_volume": 1.0,
+	"music_muted": false,
+	"device": "Default",
+
+	# Developer
+	"debug_toggle": false,
+	"debug_toggle_collision_shapes": false,
+
+	# Bindings
+	"right": Util.get_default_events("right", true),
+	"left": Util.get_default_events("left", true),
+	"up": Util.get_default_events("up", true),
+	"down": Util.get_default_events("down", true),
+	"jump": Util.get_default_events("jump", true),
+	"spin": Util.get_default_events("spin", true),
+	"dive": Util.get_default_events("dive", true),
+	"groundpound": Util.get_default_events("groundpound", true),
+}
 
 
 func _init():
@@ -21,12 +93,9 @@ func _init():
 
 
 ## Load a setting [param key] at a category [param section] in the config file.
-## Returns [param default] if nothing is found.
-func load_setting(section: String, key: String, default: Variant) -> Variant:
-	if not defaults.has(key):
-		defaults[key] = default
-
-	return config.get_value(section, key, default)
+## Returns its default value as defined in [member defaults] if nothing is found.
+func load_setting(section: String, key: String) -> Variant:
+	return config.get_value(section, key, defaults.get(key))
 
 
 ## Update a setting [param key] at a category [param section],
@@ -43,14 +112,19 @@ func has_setting(section: String, key: String):
 	return config.has_section_key(section, key)
 
 
+func get_section(setting: String):
+	for section in settings:
+		for key in settings[section]:
+			if key == setting:
+				return section
+
+	return null
+
+
 ## Sets all settings back to their default values.
 func reset_settings() -> void:
-	# This logic only works if reset_settings() is never ran
-	# before every possible option has ran a load_setting() at least once.
-	# (I.e. by setting a default value on startup.)
 	for section in config.get_sections():
 		for key in config.get_section_keys(section):
 			# Only reset if there's a default value to reset to.
-			# See load_setting().
 			if defaults.has(key):
-				change_setting(section, key, defaults[key])
+				change_setting(section, key, defaults.get(key))
